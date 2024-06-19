@@ -2,14 +2,20 @@
 2:30
 ----------
 
-
+"I don't get it. Do you have a fear of water?"
+"No? I'm more afraid of you than I am of the water. ...And I can't swim. That and I don't have the fortune of a swimsuit on me."
+"You don't need a swimsuit. Just lose the suit and I'll teach you to swim, sweetie."
+[Splash] "I'm flattered, but I'll stay up here."
+[Splash] "Your loss. Say, do you hear something?"
+"I've been exposed to a bit too much gunfire to hear well."
 
 
 ----------
 2:00
 ----------
 
-
+"Gunfire? You've never told me, what's it like where you're from?"
+"Well. The Grand United Nation of States is much bigger than this. Louder too. Our, uh, 'demons' look a lot more like you and me. Though there were guns everywhere. Amusing that's the same. In all honesty, you look like you'ld fit right in with home."
 
 
 ----------
