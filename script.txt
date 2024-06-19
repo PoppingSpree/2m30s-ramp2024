@@ -7,15 +7,23 @@
 "You don't need a swimsuit. Just lose the suit and I'll teach you to swim, sweetie."
 [Splash] "I'm flattered, but I'll stay up here."
 [Splash] "Your loss. Say, do you hear something?"
-"I've been exposed to a bit too much gunfire to hear well."
+"I've been exposed to a bit too much gunfire to hear well. What do you hear?"
+"I'm not sure. I think it's breathing? Or someone talking to themself?"
+
+(If player has approached but not actually entered the pool sector.)
+"Hey! Over here! Are you here for the pool party?"
+"Oh. Hello. Been a long time since we've seen fresh faces."
 
 
 ----------
 2:00
 ----------
 
-"Gunfire? You've never told me, what's it like where you're from?"
+"So... Gunfire? You've never told me, what's it like where you're from?"
 "Well. The Grand United Nation of States is much bigger than this. Louder too. Our, uh, 'demons' look a lot more like you and me. Though there were guns everywhere. Amusing that's the same. In all honesty, you look like you'ld fit right in with home."
+"I know how to work a gun, but I've never needed to use one. It's always been quiet and relaxed up in the hills. At most you might see those red ball guys. They're kinda cute from a distance."
+"Cacodemons? I stay away from them. They're sturdy and pack a whallop if you tick 'em off. They're rare in easier hells, fortunately. I didn't go in the harder portals. Wasn't keen on getting torn apart."
+"Did you travel the portals a lot? I never left far from home. Just the festive looking places to see who was passing through."
 
 
 ----------
