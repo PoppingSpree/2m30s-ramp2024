@@ -147,3 +147,41 @@ It feels like the characters should probably react if the player has the followe
 TBH I don't know how hard I want to work to justify the follower. I considered visiting the map with her active implies she's from an alternate timeline where Green Rolling Hills is the name of a distinct place in GUNS that she grew up in. And that this Follower Percival is not a stranger to traversing various worlds with the player. In this version of events, Jean has never met Percival. But is still amused to have company as time winds down.
 
 Buuuut that also sounds way too confusing so I may throw that out.
+--
+
+How much can I do with Model support in GZDoom? Depending on how well it handles importing 3D mesh animation with the ModelDef stuff, I can probably do the whole skybox timeline as an animation in Blender and just import it with no collision and then use a separate camera and render-to-texture setup to use the other camera's view to make the skybox image so that it looks way more dynamic and exciting than just a series of premade texture changes.
+
+--
+Some thoughts before I get back to work:
+"Why don't you just leave?" If the player was able to arrive, maybe Jean can leave the same way.
+-
+
+Completion Paradox: Since the player and NPCs count as monsters, leaving the map after convincing Percy to follow the player still makes it impossible to 100% the map. Bit after you've unlocked the follower, it's entirely possible to go back for the 100% "kills" options.
+-
+Apocalypse : Percival may ask something of Jean about their thoughts on the end. Jean might answer about not having thought about Eschatology-an uncommon term which implies he has looked into the topic at least some amount to have the jargon for it.
+--
+
+That's kinda snarky and clever. Everyone leaves. The world has 0 kills, but zero monsters, and the game still counts it as 100%. I don't really have a mechanism for the player to give Jean a reason or means to leave, but that does feel clever.
+
+Might even work as commentary on being unwilling to move on.
+--
+
+Again, I have added no mechanics for the player to answer questions. They can move around and activate interactables and shoot. That's about it. Might be something like wasting most of your ammo startling the characters without killing either of them reactivates Jean's survival instincts. Idk.
+
+There should probably be a moment around 30s or 1m where Percival is making up her mind about leaving or staying, at which point the check for the player having all of her items is done. Partly to hint that if the player waits too long, they won't have enough time to physically reach the exit anyway.
+
+--
+
+*Bang* "Heh. Now that sounds more like the home I remember."
+*Bang* "You know what they call a second warning shot? A miss."
+*Bang* "If you're going to shoot me, make it quick."
+*Bang* "Are you trying to show us something, or do you just loathe the sound of talking?"
+*Bang* "If you want to dig a hole, try a shovel. If you want to break a wall, try an ax. "
+*Bang* "Is this just how you party? I guess it's good as any."
+*Bang* "Seriously? Are you trying to be annoying?"
+*Bang.*  (Visibly flinches, but ignores)
+--
+
+I should maybe have at least one destructible object obscuring one of the items required to get the follower so that there is a consequence if the player just wastes all of their ammo before trying to do that objective. If I do that though, then I'll probably want to either have a proximity check when trying to interrupted Jean with shots, specifically ignore the shot if it breaks something destructible.
+--
+
