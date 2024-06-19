@@ -1,0 +1,149 @@
+Map info: 3 monsters, 0 secrets, 0 items. Title: 2m 30s. Jump/Crouch enabled. Short Desc: A year ago during RAMP 2023, you were invited to the pool with a "bouncy" bikini bunny lady "after everyone is done submitting" , but no matter where you looked in the final WAD there was no pool in the hub to be found. Just the endless portals to pocket worlds of RAMP. (Potential Alternate Title: Afterparty Afterlife) 
+
+You return now to the abandoned remains of the hub realm that housed RAMP 2023. There are no more portals, no guide machine, no celebratory music, and no rewards. Just a small platform in space with bits of cooked snake idols, smashed toilets, the a looping recording of a cyberduck-demon's rampage, and a trail leading to the small swimming pool. And at the pool there is the bunny and a slender pastel unicorn in a tux. The bunny claims she cannot leave. The unicorn believes it doesn't matter as everything will vanish "I'm about two minutes" . You can kill them. Or leave them. Or wait and watch with them. But does it matter? Why are you here?
+
+(The duo have a discussion as time ticks down from 150 seconds and the skybox becomes more colorful, pastel, and abstract. The player counts as the third "monster", leaving early by returning to the train forces the monsters remaining count to 1, making it the only path that does not give 100% completion score. Killing both of the others skips the timer to the last 5 seconds as everything fades to pink and purple. )
+
+--
+
+Most of the time in the map is just the dialogue. The bunny may talk about fine memories of RAMP 2023 and how they find it odd they can't remember anything else before or after. The unicorn may talk about their homeworld and how this might be their punishment for such a corrupted and selfish person before arriving in the "hells". The player cannot talk, but killing either will detail the remaining conversation to be directed at the player instead. If both are dead, there isn't much left in the map to see, thus the early ending.
+
+It might also play out differently if the player doesn't leave, but deliberately does not approach the pool to hear the conversation.
+
+--
+
+While the rabbit is unaware of it, her name is Percival and she was created for the sole purpose of being the resident of the green house with the Green Key Disc from RAMP 2023's "Green Rolling Hills with Lots of Nice Bunny Girls..." which is why she is unable to recall prior RAMPs or anything since. She couldn't meet at the pool because while it was in her original dialogue lines, the pool was never in the hub map, but instead a part of the Green Rolling Hills map. She can't remember why the pool is so important, but "the answer is so close" , she can't leave now. 
+
+Thr unicorn, Jean, in contrast was never meant to he a part of RAMP and is here partly as a cameo from a scrapped larger RAMP 2024 submission that 2m 30s is replacing out of lack of time. He retains awareness of his original world and knows that he isn't really supposed to be here. But now that he is here, he has little choice in the time that remains than to enjoy the bunny's... Bouncy qualities and flirty demeanor. Jean can be as straightforward as he likes about the Grand United Nation of States, the island of Caliber, and the many mini hells of RAMP. As far as it matters to him now now, it's all gone anyway.
+---
+
+Collecting items to get Percival out of the pool and into proper clothes might be a cute hidden branch. But she probably still won't be able to leave the map. Might also be neat if completing the hidden side objective changes the map in future playthroughs such that a copy of the completed item is already present at the start. Maybe doing it repeatedly adds more of them to the start, with no further purposes for taking or leaving them. At most, Jean acknowledges that this may be some kind of recursion or loop.
+---
+
+I'm trying to decide if they should turn into sparkles and fade away when killed, or just slump in place dazed with stars over their head. I'm not going to make gore sprites.
+--
+
+If I have time, maybe completing the alternate objective will save a flag so that the player can summon a fully dressed Percival follower either via the options menu or via console commands. To keep it tied to the secret, she despawns immediately if the flag isn't found. 
+
+Though I imagine quite a number of players would find her switching to the dress instead of staying in the bikini to he a downgrade.
+--
+
+Some potential topics for the conversation:
+"What's it like where you're from?"
+"Do you think...that it'll hurt?"
+"We could do anything right now, and nobody would know..."
+"I remember once when I thought I was dreaming I [did something embarrassing]. It... wasn't a dream."
+"What is the nature of a RAMP? What is it for? Where does it come from?"
+"Is this a Hell?"
+"Sometimes I hear music in my head. It feels like it's been a long time since the last time."
+
+(To clarify, Jean is not nearly as refined, powerful, or business minded as something like a Tux would suggest. He was a toymaker and a chemist with an interest in elastics. He had a fixation with youth, and his former partner had a genetic deficiency that made her stay looking like a child, but would result in her dying in her 20s without help. She took great pleasure in exploiting him and testing his limits in public, seeing it as just a kind of game since it wouldn't change much for her if they got in trouble or killed. In the normal timeline, he would eventually make scientific breakthroughs to help her get replacement bodies to survive. In *this* timeline, that has not happened, he's been separated from his partner, and he feels almost like vanishing is what he deserves for the thoughts and behaviors he let his partner lead him into. He's kind of a nerd, but he looks somewhat affluent due to family circumstances he isn't entirely aware of.)
+---
+
+In all honesty Jean probably wouldn't be too attracted to Percival's looks. She's a fairly curvy woman, and given what's implied about Jean's partner, that's probably not his preferred aesthetic. On the other hand, Perci being flirty with everyone is just how she is and how she's always been. She isn't really expecting to get anything of it.
+
+--
+
+What are topics that Percival might specifically want to ask about of Jean and the Player (the player cannot answer).
+
+--
+
+I have 1 week to get done. I'm not animating all of that. 
+
+Anyway, what should they be talking about before the player arrives? I think I'll move stuff like "will it hurt" to the last 30 seconds.
+--
+
+WIP so far: 
+
+----------
+2:30
+----------
+
+"I don't get it. Do you have a fear of water?"
+"No? I'm more afraid of you than I am of the water. ...And I can't swim. That and I don't have the fortune of a swimsuit on me."
+"You don't need a swimsuit. Just lose the suit and I'll teach you to swim, sweetie."
+[Splash] "I'm flattered, but I'll stay up here."
+[Splash] "Your loss. Say, do you hear something?"
+"I've been exposed to a bit too much gunfire to hear well."
+
+
+----------
+2:00
+----------
+
+"Gunfire? You've never told me, what's it like where you're from?"
+"Well. The Grand United Nation of States is much bigger than this. Louder too. Our, uh, 'demons' look a lot more like you and me. Though there were guns everywhere. Amusing that's the same. In all honesty, you look like you'ld fit right in with home."
+
+
+----------
+1:30
+----------
+
+
+
+
+----------
+1:00
+----------
+
+
+
+----------
+0:30
+----------
+
+
+
+----------
+0:00
+----------
+
+
+----------
+Jean Downed
+----------
+
+----------
+Perci Downed
+----------
+
+
+----------
+Jean Solo - 2:30
+----------
+
+----------
+Perci Solo - 2:30
+----------
+
+-----
+
+Perci is not a total amnesiac. She can very clearly recall the immediate regions of RAMP 2023's hub where all the portals were, and she recalls Green Rolling Hills, where there were three other rabbit women living in houses (well, one's a schoolhouse and one's a shop) and the fifth locked house she never went in but kept the key disc for.
+
+She's attracted to the pool because she recalled she invited someone to be here for a party and swim. But the *specifics* of why she felt like she must go for a swim is lost, and is one of the thoughts she keeps trying to remember. Other things like the lack of children, the small population, the fact that she never actually entered the portals to any of the other areas (hells) are things she probably won't question unless the dialogue organically leads her to think about it.
+---
+
+Another idea I might toy with if I get a bunch of extra time before we wrap up: add a cvar that checks for values that would only be present from RAMP 2023, or a value a specific obscure cvar that hasn't been used yet that I can set in RAMP 2025 (if it happens) and have the characters make more specific commentary about the time dilation if that is the case. Heck, I might even be able to dynamically add extra text chunks in a config file or something specifically to be read only if it's present, so it can be added in the future without any modifications to the final RAMP2024 release.
+
+---
+
+Here's the concept sketch for Perci (left) compared to her old swimsuit design (right) .
+Based on that and the GRH map, here's the items I'm thinking of having be the pickups to unlock her as a follower: 
+Striped Dress. Butterfly Belt. Green Key Disc. Weapon. RAMP Entry Ticket (any year). Serpentine Pocket watch. Photo (the thumbnail image from the Green Rolling Hills booth of RAMP 2023).
+
+(Her weapon is a Buster type projectile weapon- think of Mega Man's buster, but it's shaped more like a watergun than a arm cannon- that fires round shots that can bounce. At close range it instead captures the foe in a bubble that can be broken Bubble Bobble style. It's customized to her style and preferences. I had given it a name in the past, but I forgot what. )
+
+[image omitted, as it annohilates context. I may place an external link in the repo: https://revelromp.com/wp-content/uploads/2024/04/image.png ]
+--
+
+The collectables to unlock Follower Percival in the options menu: Striped Dress. Butterfly Belt. Green Key Disc. Weapon. RAMP Entry Ticket (any year). Serpentine Pocket watch. Photo. (The thumbnail image from the Green Rolling Hills booth of RAMP 2023).
+
+I'm not entirely sure where I'm going to place them in-game. I don't have a lot of time to actually design the map layout, so it's going to need to stay small and the player is intended to stay within hearing range of the NPCs after reaching them. Plus the 2 and a half minute time limit doesn't give the player a lot of time to really be exploring unless they keep repeating the map.
+--
+
+It feels like the characters should probably react if the player has the follower Percival with them, but I definitely don't have time to write an entire alternate set of scripts for no kill / perci down / jean down conditions with _and_ without the follower. At most I can maybe do one or two lines acknowledging the follower and then keep to the default. Or if the Follower Perci is there, then the Fading Perci will be implied to have never been there and that it has just been Jean alone.
+---
+
+TBH I don't know how hard I want to work to justify the follower. I considered visiting the map with her active implies she's from an alternate timeline where Green Rolling Hills is the name of a distinct place in GUNS that she grew up in. And that this Follower Percival is not a stranger to traversing various worlds with the player. Jean, however, had no idea GRH was a part of GUNS and has no recollection of Percival whatsoever. But is still amused to have company as time winds down.
+
+Buuuut that also sounds way too confusing so I may throw that out.
