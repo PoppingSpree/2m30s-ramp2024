@@ -119,3 +119,11 @@ Jean Solo
 Perci Solo
 ----------
 [Pondering being uncertain about what one is doing, being open minded, when and why to make or share things, trying to remember why the pool party was important]
+
+
+----------
+0:00, Percival Leaves with Player
+----------
+As the screen fades to pink (Jean left behind) or the train pulls away from the hub (Everyone leaves), show the text:
+"You may now summon Percival as a follower using the console command: summon BMPERCIVAL"
+"Percival's journey continues... with you."

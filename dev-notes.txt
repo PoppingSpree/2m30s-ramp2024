@@ -1,0 +1,24 @@
+RAMP 2024 allows EventListener in the MapInfo, but I'm pretty sure we're not allowed to modify GameInfo.
+
+In any case, we can check if the event handlers we add get removed immediately on leaving our map via:
+https://zdoom.org/wiki/Events_and_handlers
+
+void OnUnregister () 	— 	Called when the engine removes your handler from the list.
+
+void PlayerSpawned (PlayerEvent e)
+
+bool InputProcess (InputEvent e) 
+This event provides direct interface to the commonly used player input. You don't need any special steps in order to use it.
+
+MouseX and MouseY are delta values (offsets from the last mouse position). These are internally used for player aiming.
+
+KeyScan is the internal ASCII value of the pressed key while KeyChar is the real ASCII value of the pressed key. KeyString is a single-character string that contains KeyScan provided for convenience. Converting KeyChar to a string is not guaranteed to be the same as KeyString. Note that, while a bit counter-intuitive (for people unfamiliar with the console bind system), mouse buttons are considered keys for this event.
+For example, a left mouse click is registered as KeyDown+InputEvent.Key_Mouse1.
+
+Note: this is one of the few non-void methods in the event system. By returning true here you will block any processing of this event by the other event handlers if their Order is lower than the current EventHandler.
+In case of InputEvent, returning true will also mean that the generic game input handler will NOT receive the event (player will be locked from moving).
+Also, if you need to interact with the world upon receiving an event, you have to use EventHandler.SendNetworkEvent (see: networking). https://zdoom.org/wiki/Events_and_handlers#Networking
+
+--
+
+For RAMP, I don't think there's any way for me to actually run a script that interacts with anyone else's maps without directly writing lumps, which I'm sure is a no-no. So the best I can think of is if all of the characters leave, I should maybe hold the fade-out ending a little longer and display a message saying "You can now summon a new follower at any time with the console command SUMMON BMPERCIVAL" or something of that sort.
