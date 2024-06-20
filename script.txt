@@ -30,7 +30,20 @@
 1:30
 ----------
 
-
+"We could do anything right now, and nobody would know..."
+"Ah. Hahaha. Maybe we just stick to swimming lessons for now. Or you could try asking them... Though they look a bit preoccupied to me."
+(Addressing "What is the nature of a RAMP" whether they know it or not)
+"If you had the power to make a world of your own and put anything you like in it, what would you make?"
+"Nothing good, probably. Why this all of a sudden?"
+"I'm a terrible artist. I can barely draw a map and my penmanship is unreadable!"
+"Often, a 'terrible artist' is just one who hasn't been given the encouragement and time to explore and find their niche. If I ask you 'if you could make anything, what would you make?' what is the first thing to come to mind? Don't think too hard about it."
+"I suppose I'd make a giant cup of tea  to swim in! Or a big jello carrot planet that's super squishy and wiggly and juicy. But... That sounds kinda silly-"
+"And I'd make a toyhouse full of soft plushie bunny kids and a ton of glitter. At least, that's how I got my start. It was never my plan or desire to delve into transmortalism, but when my partner needed me most, I couldn't think of anything other than replacing parts of her like the dolls she adored. I was terrified. I've made bad calls before. Been called a creep more times than I can remember. And in the end, I was the one who got misplaced and left behind."
+"I'm sorry. I didn't know..."
+"And you didn't need to know. Sorry."
+"I..."
+"But, perhaps, if you somehow get another chance? Just try making things for yourself. Experiment. Have fun. And besides, is swimming not an art? You seem plenty good at that."
+"I'll... think about it. Thank you."
 
 
 ----------
@@ -42,13 +55,39 @@
 ----------
 0:30
 ----------
-"Whoa. It's kinda pretty out there. ...Do you think that it'll hurt?"
+(Player has NOT retreived all of Perci's items)
+"Whoa. It's kinda pretty out there. And kinda scary. ...Do you think that it'll hurt?"
+"Doubt it. No body: no senses. No senses: no pain. Or joy for that matter."
+"Why do we hurt? Wouldn't it be easier if never felt pain?"
+"Hurt is a system for bodies to know they need to change if they wish to survive. It's a fragile system, but an important one."
 
+(Player HAS retreived all of Perci's items)
+"Whoa. It looks like a painting out there now. I want to go out there. I want to touch it for myself. Or just see it a little longer.
+"Then you should. Follow them. Maybe they can get out the same way they got in. Not much time left."
+"What about you? Aren't you coming?"
+"..."
+
+(Player has NOT sufficiently annoyed Jean with their weapon)
+"Does it really matter? I've made my bed and now I've got to lay in it."
+"Does it have to matter? Let's just try something and see how it goes."
+"I followed my heart and hurt a lot of people for the trouble. I have nothing left to share. Go."
+"...Bye..."
+
+(Player HAS sufficiently annoyed Jean with their weapon)
+"I don't want to."
+"What!? Come ON, we can at least see what happens if we try!"
+"Let me finish. I don't want to go. I want terrible things. That won't change. But right now I feel like I have to do something."
+"Then just do pretend terrible things and figure out the rest later."
+"That doesn't make sense?"
+"Catch up if you want me to make it make sense."
+"Why are you like this!?"
 
 ----------
 0:00
 ----------
-
+(Screen fading to pink.)
+"Why can't I remember what I forgot?"
+"Why am I like this?"
 
 ----------
 Jean Downed
@@ -60,9 +99,9 @@ Perci Downed
 
 
 ----------
-Jean Solo - 2:30
+Jean Solo
 ----------
 
 ----------
-Perci Solo - 2:30
+Perci Solo
 ----------
