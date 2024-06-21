@@ -27,3 +27,6 @@ For RAMP, I don't think there's any way for me to actually run a script that int
 
 If I want to re-render the Perci sprites with more of a PS1 look https://blender.stackexchange.com/questions/208612/n64-style-vertex-shading-lighting-for-low-poly-models
 
+--
+
+Quick memo for if I do submit a HOLLOWROUND map this year: Consider having both kind of "Squeaker" class Beast Balloon enemies having a 1 in 100 chance of doing a jump 10 times stronger than they normally would (maybe only do this on indoors maps or with invisible walls so they don't go out of bounds.
