@@ -22,3 +22,8 @@ Also, if you need to interact with the world upon receiving an event, you have t
 --
 
 For RAMP, I don't think there's any way for me to actually run a script that interacts with anyone else's maps without directly writing lumps, which I'm sure is a no-no. So the best I can think of is if all of the characters leave, I should maybe hold the fade-out ending a little longer and display a message saying "You can now summon a new follower at any time with the console command SUMMON BMPERCIVAL" or something of that sort.
+
+--
+
+If I want to re-render the Perci sprites with more of a PS1 look https://blender.stackexchange.com/questions/208612/n64-style-vertex-shading-lighting-for-low-poly-models
+
