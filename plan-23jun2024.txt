@@ -1,0 +1,16 @@
+* Is it actually safe to just do a separate duplicate playerPawn for each spawned player and hijack the .mo value? Or does that break when leaving the level? Or break when dying?
+* Try to transfer over the stuff that was previously in ACS for purpose of a custom player movement/etc into ZScript.
+* Import the dialogue from the script
+* Set the dialogue to actually play on a schedule
+* Slice the script down a bit so we can randomize it maybe? Or if we use a static thinker, we can grab which line to play based on a counter on how many times the map has been loaded and doing a modulus on it?
+* Fix follower percy to use the three state approach (mimic / chase / teleport)
+* show some kind of message somewhere that the follower can be summoned via console commands.
+* (MAYBE bug David to ask if we can add options menus to summon the follower automatically on start of map, but that's almost certainly gonna go against the spirit of keeping maps kinda separated into their own thing? Lots of potential for breakage with that. Probably easier for me to just upload the follower as a separate wad and let people have the download link if they want it persistent.)
+* can you actually finish the level? like bro you should have done that already.
+
+* mice girls are cute.
+
+
+* new music? You probably don't have time tho just reuse the old midis probably.
+* more sprites. you're going to be tempted to do this when you don't have time. don't. Do it last.
+

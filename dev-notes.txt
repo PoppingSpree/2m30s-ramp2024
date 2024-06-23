@@ -79,3 +79,18 @@ oh. ok.
 --
 
 turns out the mono-complete version I installed was not the right one and thus didn't include msbuild. oops. also I'm going to make another commit because I feel afraid something's going to explode now.
+--
+
+// Can potentially use musplaying to jump around the music playtime or check if it's done / etc
+
+// Could potentially hack together my own player select menu in-game
+// with a mix of Strife convos and the PlayerClasses global array.
+
+--
+
+Another potentially risky workaround if I really *realy* want the follower to carry across maps: Use the custom playerpawns I'm using to add the extra functions responsible for spawning the follower. And change the PlayerInfo to point to that class for the remainder of the game.
+
+Probably not _polite_ to do that though, there is a chance of it breaking things, and David might be cross if it does so. But if it doesn't break, nobody would notice...
+--
+
+One minor downside is that Spawn uses global offsets, not relative (in contrast to A_SpawnItemEx), so we can’t spawn CacoBaby 64 units in front of CacoDaddy. But that’s not a problem, since we can spawn it and then immediately move it using Warp (a ZScript internal version of the A_Warp function):

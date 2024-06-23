@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Ultimate Doom Builder (UDB)
+Exec=mono /home/ann/RAMP2024/lin-udb/UltimateDoomBuilder/Build/Builder.exe
+Icon=/home/ann/RAMP2024/lin-udb/UltimateDoomBuilder/icon.png
+Type=Application
+Categories=Game;Development
+Terminal=false
