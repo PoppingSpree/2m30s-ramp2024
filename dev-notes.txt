@@ -30,3 +30,52 @@ If I want to re-render the Perci sprites with more of a PS1 look https://blender
 --
 
 Quick memo for if I do submit a HOLLOWROUND map this year: Consider having both kind of "Squeaker" class Beast Balloon enemies having a 1 in 100 chance of doing a jump 10 times stronger than they normally would (maybe only do this on indoors maps or with invisible walls so they don't go out of bounds.
+
+--
+
+I've been looking through the gzdoompk3 to figure out how to do custom variables and when I tried to copypaste and change the names to my own variables or swap around the order of the new Property Name and the backing variable name, it didn't work. Spent almost 30 minutes alternating between trying things and searching the wiki. Through a stroke of luck and searching the web, finally managed to hit on https://zdoom.org/wiki/ZScript_custom_properties which was annoyingly hard to find.
+
+"Inside the Default block, for the main actor class or any inheriting class: <NameOfBaseClass>.PropertyName <LocalVar1>, <LocalVar2>, ..."
+That's it. That's the simple secret sauce I was missing. NameOfBaseClass.
+--
+
+I could use A_RadiusThrust to make a gravity weapon...
+--
+
+Species string
+
+    Defines the species the monster belongs to. This determines infighting behavior, since a monster's missile do not inflict harm (except through splash damage) to other monsters belonging to the same species by default.
+    When used with keys, this property allows for new keys to open the same locks as the keys they are referencing with the property, without the need to redefine the locks to add the new keys. For example, setting the key's species to RedCard will allow it to open locks as if it were a red keycard.
+    Default is None that makes the game to look up the actor this actor inherits from and has this property set to something else.
+
+--
+Got an idea. StaticEventListeners are initialized at engine start and destroyed when the engine closes. If I can still use it in my MapInfo, that may be my way to pass Follower info around without CVars or weird hackery.
+--
+
+I can potentially pull some stuff from https://github.com/ZDoom/gzdoom/blob/master/wadsrc/static/zscript/actors/player/player.zs#L13 like:
+
+override void Tick()
+	{
+		if (player != NULL && player.mo == self && CanCrouch() && player.playerstate != PST_DEAD)
+		{
+			Height = FullHeight * player.crouchfactor;
+		}
+
+--
+
+Stepping through DiscoCat's UDB build guide. I'm using Pop! OS instead of Linux Mint. I got mono-complete installed from stuff I had done earlier, but I don't have cmake and I'm not sure if I have msbuild.
+--
+
+Oh OK I see cmake in the app store, grabbing that.
+
+--
+
+Oh. Duh. I should have started with following the UDB linux build instructions before building acc and the node thingy. Fortunately, both of those work fine. https://github.com/UltimateDoomBuilder/UltimateDoomBuilder Let's get that built first.
+--
+
+"Install Mono. The `mono-complete` package from the Debian repo doesn't include `msbuild`, so you have to install `mono-complete` by following the instructions on the Mono project's website: https://www.mono-project.com/download/stable/#download-lin
+"
+oh. ok.
+--
+
+turns out the mono-complete version I installed was not the right one and thus didn't include msbuild. oops. also I'm going to make another commit because I feel afraid something's going to explode now.

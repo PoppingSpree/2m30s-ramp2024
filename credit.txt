@@ -1,0 +1,6 @@
+https://opengameart.org/content/2d-explosion-animations-frame-by-frame
+Author: Sinestesia
+License: CC0 (Effectively Public Domain)
+These explosions look pretty sick, so I'll probably try this. It's CC0 too. But the filesize might be a little weighty for DOOM.
+--
+
