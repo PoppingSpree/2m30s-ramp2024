@@ -2106,6 +2106,29 @@ class BMSqueakerRedChew : BMSqueakerBlueChew
 	
 class BMPercivalFollower : Actor
 {
+	enum PercivalFollowerBehaviorState
+	{
+		PERCIVAL_FOLLOWER_STATE_IDLE,
+		PERCIVAL_FOLLOWER_STATE_MIMIC,
+		PERCIVAL_FOLLOWER_STATE_CATCH_UP,
+		PERCIVAL_FOLLOWER_STATE_WARP,
+		PERCIVAL_FOLLOWER_STATE_PANIC,
+	};
+
+	PercivalFollowerBehaviorState follow_state;
+	bool initialized;
+
+	double distanceFromPlayer;
+	double mimicRangeMin;
+	double mimicRangeMax;
+	double catchupRangeMin;
+	double catchupRangeMax;
+	double warpRangeMin;
+
+	int arrLeaderPosLength;
+	int arrLeaderPosCurrentIndex;
+	Vector3[35] arrLeaderPos; // Wish this were dynamic...
+
 	Default
 	{
 		Tag "Percival (Follower)";
@@ -2123,9 +2146,177 @@ class BMPercivalFollower : Actor
 			BMPC A 10 A_Look();
 			Loop;
 		See:
-			BMPC A -1;
+			BMPC A 10 A_Chase("MeleeAttack", "DoomImpBall", CHF_DONTMOVE); //A_FaceTarget?
+			// A_CustomComboAttack("DoomImpBall", 32, 3 * random(1, 8), "imp/melee")
 			Loop;
     }
+
+	override void Tick()
+	{
+		super.Tick();
+		// Dealing with nondeterministic code - https://zdoom.org/wiki/Creating_multiplayer-friendly_ZScript
+		if (!initialized)
+		{
+			console.Printf("Initializing Percival");
+			InitPercival();
+		}
+		if (!master) {
+			// Consider having a separate behavior where she just roams if there's nobody to follow.
+			console.Printf("No value set for 'master', cannot follow.");
+			return;
+		}
+		// https://zdoom.org/wiki/Distance3D - Distance stuff.
+
+		distanceFromPlayer = Distance3D(master);
+		SelectState();
+		ActBasedOnState(follow_state);
+	}
+
+	void SelectState()
+	{
+		if (distanceFromPlayer < mimicRangeMin)
+		{
+			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
+			follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
+		}
+		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax)
+		{
+			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
+			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
+		}
+		else if (distanceFromPlayer >= mimicRangeMax && distanceFromPlayer < catchupRangeMax)
+		{
+			//if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP) {console.printF("Switching to Catch-Up State.");}
+			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
+		}
+		else if (distanceFromPlayer >= catchupRangeMax)
+		{
+			//if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP) {console.printF("Switching to Warp State.");}
+			follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
+		}
+	}
+
+	void ActBasedOnState(PercivalFollowerBehaviorState follow_state)
+	{
+		switch (follow_state)
+		{
+			case PERCIVAL_FOLLOWER_STATE_IDLE:
+				PercivalFollowerTickIdle();
+				ClearArrLeader();
+				break;
+
+			case PERCIVAL_FOLLOWER_STATE_MIMIC:
+				PercivalFollowerTickMimic();
+				break;
+
+			case PERCIVAL_FOLLOWER_STATE_CATCH_UP:
+				PercivalFollowerTickCatchUp();
+				ClearArrLeader();
+				break;
+
+			case PERCIVAL_FOLLOWER_STATE_WARP:
+				PercivalFollowerTickWarp();
+				ClearArrLeader();
+				break;
+
+			case PERCIVAL_FOLLOWER_STATE_PANIC:
+				PercivalFollowerTickPanic();
+				ClearArrLeader();
+				break;
+		}
+	}
+
+	void PercivalFollowerTickIdle()
+	{
+		// console.Printf("Idle...");
+
+	}
+
+	void PercivalFollowerTickMimic()
+	{
+		// console.Printf("Mimic...");
+		// We don't want to shuffle memory around,
+		// So we'll use a carousel style cursor index.
+
+		// There was a safety null check here. It's gone now.
+
+		// Turns out SetXYZ is mostly good for "assuming" a position,
+		// not for actually moving. SetOrigin instead.
+		console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		SetOrigin(arrLeaderPos[arrLeaderPosCurrentIndex], true);
+		// Consumed the slot. We can replace it now.
+		arrLeaderPos[arrLeaderPosCurrentIndex] = master.pos;
+
+		arrLeaderPosCurrentIndex++;
+		if (arrLeaderPosCurrentIndex >= arrLeaderPosLength)
+		{
+			arrLeaderPosCurrentIndex = 0;
+		}
+	}
+
+	void PercivalFollowerTickCatchUp()
+	{
+		// console.Printf("CatchUp...");
+	}
+
+	void PercivalFollowerTickWarp()
+	{
+		// console.Printf("Warp...");
+		SetOrigin(master.Pos, true);
+	}
+
+	void PercivalFollowerTickPanic()
+	{
+
+	}
+
+	void InitPercival()
+	{
+		/*
+		I think the intended paradigm is that I make properties for all of these and set it up in the Default but asfasdfaf
+		*/
+		follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
+
+		distanceFromPlayer = 0.0;
+		mimicRangeMin = 0.0;
+		mimicRangeMax = 512.0;
+		catchupRangeMin = 512.0;
+		catchupRangeMax =  1024.0;
+		warpRangeMin = 2048.0;
+
+		arrLeaderPosLength = 35; // Please remember to manually match this to the length you defined earlier.
+		arrLeaderPosCurrentIndex = 0;
+		// arrLeaderPosLength.Resize(arrLeaderPosLength);
+		// Can't figurte out how to get dynamic arrays to work with Vector3.
+		let v = (0,0,0);
+		for (int i = 0; i < arrLeaderPosLength; i++)
+		{
+			// Player position isn't set yet... so just zero instead of master.Pos?
+
+			arrLeaderPos[i] = v;
+		}
+
+		if (!master)
+		{
+			// Default to following the "host" player. This isn't proper, we should
+			// probably track a list of all summoned followers and their corresponding
+			// players, but this will work for the time I have left before RAMP ends.
+			master = players[net_arbitrator].mo;
+		}
+
+		initialized = true;
+	}
+
+	void ClearArrLeader()
+	{
+		for (int i = 0; i < arrLeaderPosLength; i++)
+		{
+			// There's probably some way to safely nullcheck the master.Pos
+			// But I will figure it out when I have more time probably.
+
+			arrLeaderPos[i] = master.Pos;
+		}
+	}
 }
 
 class BMFollowerPercivalEvents : EventHandler
