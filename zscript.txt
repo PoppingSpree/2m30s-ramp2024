@@ -2114,21 +2114,23 @@ class BMPercivalFollower : Actor
 		PERCIVAL_FOLLOWER_STATE_WARP,
 		PERCIVAL_FOLLOWER_STATE_PANIC,
 	};
-
+	
 	PercivalFollowerBehaviorState follow_state;
 	bool initialized;
-
+	
+	double jumpStrength;
+	
 	double distanceFromPlayer;
 	double mimicRangeMin;
 	double mimicRangeMax;
 	double catchupRangeMin;
 	double catchupRangeMax;
 	double warpRangeMin;
-
+	
 	int arrLeaderPosLength;
 	int arrLeaderPosCurrentIndex;
 	Vector3[35] arrLeaderPos; // Wish this were dynamic...
-
+	
 	Default
 	{
 		Tag "Percival (Follower)";
@@ -2146,16 +2148,26 @@ class BMPercivalFollower : Actor
 			BMPC A 10 A_Look();
 			Loop;
 		See:
-			BMPC A 10 A_Chase("MeleeAttack", "DoomImpBall", CHF_DONTMOVE); //A_FaceTarget?
+			BMPC A 10 A_Chase("Melee", "Missile", CHF_DONTMOVE); //A_FaceTarget?
 			// A_CustomComboAttack("DoomImpBall", 32, 3 * random(1, 8), "imp/melee")
 			Loop;
+		Melee:
+			BMPC A 10 A_FaceTarget();
+			BMPC A 8 A_CustomMeleeAttack(random(1, 10) * 6, "skeleton/melee");
+			BMPC A 8;
+			Goto See;
+		Missile:
+			BMPC A 10 A_FaceTarget();
+			BMPC A 8 A_PosAttack();
+			BMPC A 8;
+			Goto See;
     }
-
+	
 	override void Tick()
-	{
+	{	
 		super.Tick();
 		// Dealing with nondeterministic code - https://zdoom.org/wiki/Creating_multiplayer-friendly_ZScript
-		if (!initialized)
+		if (!initialized) 
 		{
 			console.Printf("Initializing Percival");
 			InitPercival();
@@ -2166,36 +2178,36 @@ class BMPercivalFollower : Actor
 			return;
 		}
 		// https://zdoom.org/wiki/Distance3D - Distance stuff.
-
+		
 		distanceFromPlayer = Distance3D(master);
 		SelectState();
 		ActBasedOnState(follow_state);
 	}
-
+	
 	void SelectState()
 	{
-		if (distanceFromPlayer < mimicRangeMin)
+		if (distanceFromPlayer < mimicRangeMin) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
-		}
-		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax)
+		} 
+		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
-		}
-		else if (distanceFromPlayer >= mimicRangeMax && distanceFromPlayer < catchupRangeMax)
+		} 
+		else if (distanceFromPlayer >= mimicRangeMax && distanceFromPlayer < catchupRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP) {console.printF("Switching to Catch-Up State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
-		}
-		else if (distanceFromPlayer >= catchupRangeMax)
+		} 
+		else if (distanceFromPlayer >= catchupRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP) {console.printF("Switching to Warp State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
 		}
 	}
-
+	
 	void ActBasedOnState(PercivalFollowerBehaviorState follow_state)
 	{
 		switch (follow_state)
@@ -2204,159 +2216,180 @@ class BMPercivalFollower : Actor
 				PercivalFollowerTickIdle();
 				ClearArrLeader();
 				break;
-
+				
 			case PERCIVAL_FOLLOWER_STATE_MIMIC:
 				PercivalFollowerTickMimic();
 				break;
-
+				
 			case PERCIVAL_FOLLOWER_STATE_CATCH_UP:
 				PercivalFollowerTickCatchUp();
 				ClearArrLeader();
 				break;
-
+				
 			case PERCIVAL_FOLLOWER_STATE_WARP:
 				PercivalFollowerTickWarp();
 				ClearArrLeader();
 				break;
-
+				
 			case PERCIVAL_FOLLOWER_STATE_PANIC:
 				PercivalFollowerTickPanic();
 				ClearArrLeader();
 				break;
 		}
 	}
-
+	
 	void PercivalFollowerTickIdle()
 	{
 		// console.Printf("Idle...");
 		A_Chase();
 	}
-
+	
 	void PercivalFollowerTickMimic()
 	{
 		// console.Printf("Mimic...");
-		// We don't want to shuffle memory around,
+		// We don't want to shuffle memory around, 
 		// So we'll use a carousel style cursor index.
-
+		
 		// There was a safety null check here. It's gone now.
-
-		// Turns out SetXYZ is mostly good for "assuming" a position,
+		
+		// Turns out SetXYZ is mostly good for "assuming" a position, 
 		// not for actually moving. SetOrigin instead.
-		console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-		SetOrigin(arrLeaderPos[arrLeaderPosCurrentIndex], true);
+		//console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		
+		Vector3 newPos = (arrLeaderPos[arrLeaderPosCurrentIndex].X, arrLeaderPos[arrLeaderPosCurrentIndex].Y, Pos.Z);
+		SetOrigin(newPos, true); 
+		
+		if (arrLeaderPos[arrLeaderPosCurrentIndex].Z - Pos.Z > 20) {ActJump();}
 		// Consumed the slot. We can replace it now.
 		arrLeaderPos[arrLeaderPosCurrentIndex] = master.pos;
-
+		
 		arrLeaderPosCurrentIndex++;
-		if (arrLeaderPosCurrentIndex >= arrLeaderPosLength)
+		if (arrLeaderPosCurrentIndex >= arrLeaderPosLength) 
 		{
 			arrLeaderPosCurrentIndex = 0;
 		}
-
-		A_FaceMaster();
+		
+		if (!target) 
+		{
+			A_FaceMaster();
+		} 
+		else 
+		{
+			A_FaceTarget();
+		}
+		
 	}
-
+	
 	void PercivalFollowerTickCatchUp()
 	{
 		// console.Printf("CatchUp...");
 		A_FaceMaster();
-
+		
 		// Figure out where we want to be.
 		Vector3 targetPos = master.Pos;
-
-
+		
+		
 		// Figure out the distance (ignore z bc/ jumping?)
 		double dist = DistVec3IgnoreZ(pos, targetPos);
-
+		
 		//wait, wouldn't the length of the displacement vector also be the distance?... Oops.
 		Vector3 displacement = targetPos - pos;
-
-
+		
+		
 		// If move speed will get us there, just warp there.
-		if (dist <= speed)
+		if (dist <= speed) 
 		{
 			SetOrigin(targetPos, true);
 		}
 		// If it won't, we normalize the vector and multiply it by our speed
 		// to get the new position.
-		else
+		else 
 		{
 			SetOrigin(displacement.Unit() * speed, true); //Unit is a Normalized copy.
 		}
-
-
-
-
-
+		
+		
+		
+		
+		
 	}
-
+	
 	double DistVec3IgnoreZ(Vector3 startPos, Vector3 endPos)
 	{
 		double distance = 0.0;
-
+		
 		double xDiff = endPos.x - startPos.x;
 		double yDiff = endPos.y - startPos.y;
 		distance = sqrt((xDiff*xDiff)  + (yDiff*yDiff));
-
+		
 		return distance;
 	}
-
+	
 	void PercivalFollowerTickWarp()
 	{
 		// console.Printf("Warp...");
-		SetOrigin(master.Pos, true);
+		SetOrigin(master.Pos, true); 
 	}
-
+	
 	void PercivalFollowerTickPanic()
 	{
-
+	
 	}
-
+	
+	void ActJump()
+	{
+		if (Vel.Z <= 0) {Vel.Z = 0;}
+		Vel.Z += jumpStrength;
+	}
+	
 	void InitPercival()
 	{
 		/*
 		I think the intended paradigm is that I make properties for all of these and set it up in the Default but asfasdfaf
 		*/
 		follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
-
+		
+		jumpStrength = 32.0;
+		
 		distanceFromPlayer = 0.0;
-		mimicRangeMin = 0.0;
+		mimicRangeMin = 64.0;
 		mimicRangeMax = 512.0;
 		catchupRangeMin = 512.0;
 		catchupRangeMax =  1024.0;
 		warpRangeMin = 2048.0;
-
+		
 		arrLeaderPosLength = 35; // Please remember to manually match this to the length you defined earlier.
 		arrLeaderPosCurrentIndex = 0;
-		// arrLeaderPosLength.Resize(arrLeaderPosLength);
+		// arrLeaderPosLength.Resize(arrLeaderPosLength); 
 		// Can't figurte out how to get dynamic arrays to work with Vector3.
 		let v = (0,0,0);
-		for (int i = 0; i < arrLeaderPosLength; i++)
+		for (int i = 0; i < arrLeaderPosLength; i++) 
 		{
 			// Player position isn't set yet... so just zero instead of master.Pos?
-
+			
 			arrLeaderPos[i] = v;
 		}
-
-		if (!master)
+		
+		if (!master) 
 		{
 			// Default to following the "host" player. This isn't proper, we should
 			// probably track a list of all summoned followers and their corresponding
 			// players, but this will work for the time I have left before RAMP ends.
 			master = players[net_arbitrator].mo;
 		}
-
+		
 		initialized = true;
 	}
-
+	
 	void ClearArrLeader()
 	{
-		for (int i = 0; i < arrLeaderPosLength; i++)
+		for (int i = 0; i < arrLeaderPosLength; i++) 
 		{
 			// There's probably some way to safely nullcheck the master.Pos
 			// But I will figure it out when I have more time probably.
-
+			
 			arrLeaderPos[i] = master.Pos;
+			arrLeaderPos[i].Y -= 64;
 		}
 	}
 }
@@ -2367,14 +2400,22 @@ class BMNPCJean : Actor
 	{
 		Tag "Jean NPC";
 	}
-
-	Spawn:
-			BMRB E -1;
+	
+	States
+	{
+		Spawn:
+			BMSM E -1;
 			Loop;
-	Death:
-		BMRB E Random(20, 35);
-		TNT1 A;
-		Stop;
+		Pain:
+			BMSM E 35;
+			Loop;
+		Death:
+			BMSM E random(35, 50);
+			BMSM E 6 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+	}
 }
 
 class BMFollowerPercivalEvents : EventHandler
@@ -2400,17 +2441,17 @@ class BMPlayerALLCOMERS : DoomPlayer
 	int crouch_dash_active_duration;
 	int crouch_dash_active_rem;
 	int crouch_dash_vel_dir_magnitude;
-
+	
 	int crouchDashActiveDuration;
 	int crouchDashActiveRem;
-
+	
 	double fastfallSpeed;
 
 	Default
 	{
 		//Tag "Player (Al L. Comers)";
 		
-
+		
 		Speed 1;
 		Health 100;
 		Radius 16;
@@ -2527,12 +2568,12 @@ class BMPlayerALLCOMERS : DoomPlayer
 		crouchDashSpeed = 77.0;
 		crouchDashCooldownRemaining = 0;
 		crouchDashCooldownWait = 35;
-
+		
 		crouchDashActiveDuration = 7;
 		crouchDashActiveRem = 0;
-
+		
 		fastfallSpeed = -64.0;
-
+		
 	}
 	
 	override void Tick()
@@ -2543,21 +2584,21 @@ class BMPlayerALLCOMERS : DoomPlayer
 	
 	void HandleDashInput()
 	{
-		if (CanAirDash())
+		if (CanAirDash()) 
 		{
 			DoAirDash();
 		}
-		else
+		else 
 		{
 			A_StartSound("BMCANT");
 		}
 	}
-
+	
 	bool CanAirDash()
 	{
 		return crouchDashCooldownRemaining < 1 && health > 0;
 	}
-
+	
 	void DoAirDash()
 	{
 		crouchDashCooldownRemaining = crouchDashCooldownWait + crouchDashActiveDuration;
@@ -2565,24 +2606,24 @@ class BMPlayerALLCOMERS : DoomPlayer
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		A_StartSound("BMTCH");
 	}
-
+	
 	void HandleFastFallInput()
 	{
-		if (CanFastFall())
+		if (CanFastFall()) 
 		{
 			DoFastFall();
 		}
-		else
+		else 
 		{
 			//A_StartSound("BMCANT");
 		}
 	}
-
+	
 	bool CanFastFall()
 	{
 		return Vel.Z < 0.0;
 	}
-
+	
 	void DoFastFall()
 	{
 		Vel.X = 0;
@@ -2591,7 +2632,7 @@ class BMPlayerALLCOMERS : DoomPlayer
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		//A_StartSound("BMTCH");
 	}
-
+	
 	void TickDash()
 	{
 		if (crouchDashActiveRem > 0)
@@ -2601,22 +2642,22 @@ class BMPlayerALLCOMERS : DoomPlayer
 			{
 				// If we want a specific action for trying to dodge while still, it should probably go here. Maybe a backflip? A spot-dodge?
 			}
-			else
+			else 
 			{
 				Vel.X = (Vel.X / currentSpeed) * crouchDashSpeed;
 				Vel.Y = (Vel.Y / currentSpeed) * crouchDashSpeed;
 				Vel.Z = 0;
 			}
 		}
-
+	
 		if (crouchDashCooldownRemaining > 0) {crouchDashCooldownRemaining--;}
 		if (crouchDashActiveRem > 0) {crouchDashActiveRem--;}
 		if (crouchDashCooldownRemaining == 1)
         {
             A_StartSound("BMNDASHR");
         }
-
-
+		
+		
 	}
 }
 
@@ -2679,14 +2720,14 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		int bind1, bind2 = Bindings.GetKeysForCommand("Jump");
 		bool intendToFastFall = e.KeyScan == bind1 || e.KeyScan == bind2;
 		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
-		if (intendToFastFall)
+		if (intendToFastFall) 
 		{
 			console.Printf("Intending to FastFall. Sending the network message.");
 			EventHandler.SendNetworkEvent("BMActFastFall");
 		}
 		return false;
 	}
-
+	
 	override void NetworkProcess(ConsoleEvent e)
 	{
 		if (e.Name == "BMActDash") 
@@ -2703,22 +2744,22 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			 console.Printf("This player probably can't airdash?");
 			}
 		}
-		else if (e.Name == "BMActFastFall")
+		else if (e.Name == "BMActFastFall") 
 		{
 			//TODO: refactor and move this repeating junk into a function.
 			PlayerPawn theCallingPlayerPawn = players[e.player].mo;
 			BMPlayerALLCOMERS bmpa = null;
-			if (theCallingPlayerPawn is "BMPlayerALLCOMERS")
+			if (theCallingPlayerPawn is "BMPlayerALLCOMERS") 
 			{
 				bmpa = BMPlayerALLCOMERS(theCallingPlayerPawn);
 				bmpa.HandleFastFallInput();
 			}
-			else
+			else 
 			{
 			 console.Printf("This player probably can't fastfall?");
 			}
 		}
-	}
+	}	
 }
 
 class KissPanicMeleeEnemy : Demon
@@ -2728,17 +2769,21 @@ class KissPanicMeleeEnemy : Demon
 		Tag "KissPanic Melee";
 		Radius 48;
         Height 48;
+		Scale 0.25;
 	}
-
+	
     states
     {
         Spawn:
 			BMSM A 25;
-			BMSM A 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
 			Loop;
+		Pain:
+			BMSM F 6;
+			BMSM F 12 A_Pain;
+			Goto See;
 		Death:
 			BMSM F random(10, 20);
-			BMSW F 6 35 A_SpawnProjectile("BMFireyBoom");
+			BMSM F 35 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
@@ -2756,11 +2801,17 @@ class KissPanicSam : KissPanicMeleeEnemy
     {
         Spawn:
 			BMSM D 25;
-			BMSM D 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
 			Loop;
+		See:
+			BMSM D 2 Fast A_Chase;
+			Loop;
+		Pain:
+			BMSM I 6;
+			BMSM I 12 A_Pain;
+			Goto See;
 		Death:
 			BMSM I random(10, 20);
-			BMSW I 6 35 A_SpawnProjectile("BMFireyBoom");
+			BMSM I 36 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
@@ -2774,16 +2825,23 @@ class KissPanicFran : KissPanicMeleeEnemy
 	{
 		Tag "KissPanic Fran";
 	}
-
+	
     states
     {
         Spawn:
 			BMSM B 25;
-			BMSM B 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
 			Loop;
+		See:
+			BMSM B 2 A_Chase;
+			Loop;
+		Pain:
+			BMSM G 6;
+			BMSM G 12 A_Pain;
+			Goto See;
 		Death:
 			BMSM G random(10, 20);
-			BMSW G 6 35 A_SpawnProjectile("BMFireyBoom");
+			BMSM G random(35, 70);
+			BMSM G 20 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
@@ -2796,16 +2854,23 @@ class KissPanicCig : KissPanicMeleeEnemy
 	{
 		Tag "KissPanic Cigfried";
 	}
-
+	
     states
     {
         Spawn:
 			BMSM A 25;
-			BMSM A 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
 			Loop;
+		See:
+			BMSM A 2 A_Chase;
+			Loop;
+		Pain:
+			BMSM F 6;
+			BMSM F 12 A_Pain;
+			Goto See;
 		Death:
 			BMSM F random(10, 20);
-			BMSW F 6 35 A_SpawnProjectile("BMFireyBoom");
+			BMSM F 140;
+			BMSM F 20 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
@@ -2818,16 +2883,23 @@ class KissPanicGo : KissPanicMeleeEnemy
 	{
 		Tag "KissPanic Gogo";
 	}
-
-    states
+	
+    States
     {
         Spawn:
 			BMSM C 25;
-			BMSM C 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
 			Loop;
+		See:
+			BMSM C 2 Fast A_Chase;
+			Loop;
+		Pain:
+			BMSM H 6;
+			BMSM H 12 A_Pain;
+			Goto See;
 		Death:
 			BMSM H random(10, 20);
-			BMSW H 6 35 A_SpawnProjectile("BMFireyBoom");
+			BMSM H random(5, 45);
+			BMSM H 20 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
