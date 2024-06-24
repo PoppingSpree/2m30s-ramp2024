@@ -2527,7 +2527,6 @@ class BMPlayerALLCOMERS : DoomPlayer
 	
 	void HandleDashInput()
 	{
-		console.Printf("LET'S GOOOOOO");
 		if (CanAirDash())
 		{
 			DoAirDash();
@@ -2549,6 +2548,32 @@ class BMPlayerALLCOMERS : DoomPlayer
 		crouchDashActiveRem = crouchDashActiveDuration;
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		A_StartSound("BMTCH");
+	}
+
+	void HandleFastFallInput()
+	{
+		if (CanFastFall())
+		{
+			DoFastFall();
+		}
+		else
+		{
+			//A_StartSound("BMCANT");
+		}
+	}
+
+	bool CanFastFall()
+	{
+		return Vel.Z < 0.0;
+	}
+
+	void DoFastFall()
+	{
+		Vel.X = 0;
+		Vel.Y = 0;
+		Vel.Z = fastfallSpeed;
+		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
+		//A_StartSound("BMTCH");
 	}
 
 	void TickDash()
@@ -2633,11 +2658,23 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	}
 	*/
 	
+	override bool InputProcess(InputEvent e)
+	{
+		int bind1, bind2 = Bindings.GetKeysForCommand("Jump");
+		bool intendToFastFall = e.KeyScan == bind1 || e.KeyScan == bind2;
+		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
+		if (intendToFastFall)
+		{
+			console.Printf("Intending to FastFall. Sending the network message.");
+			EventHandler.SendNetworkEvent("BMActFastFall");
+		}
+		return false;
+	}
+
 	override void NetworkProcess(ConsoleEvent e)
 	{
 		if (e.Name == "BMActDash") 
 		{
-			console.Printf("BMActDash");
 			PlayerPawn theCallingPlayerPawn = players[e.player].mo;
 			BMPlayerALLCOMERS bmpa = null;
 			if (theCallingPlayerPawn is "BMPlayerALLCOMERS") 
@@ -2650,8 +2687,135 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			 console.Printf("This player probably can't airdash?");
 			}
 		}
+		else if (e.Name == "BMActFastFall")
+		{
+			//TODO: refactor and move this repeating junk into a function.
+			PlayerPawn theCallingPlayerPawn = players[e.player].mo;
+			BMPlayerALLCOMERS bmpa = null;
+			if (theCallingPlayerPawn is "BMPlayerALLCOMERS")
+			{
+				bmpa = BMPlayerALLCOMERS(theCallingPlayerPawn);
+				bmpa.HandleFastFallInput();
+			}
+			else
+			{
+			 console.Printf("This player probably can't fastfall?");
+			}
+		}
+	}
+}
+
+class KissPanicMeleeEnemy : Demon
+{
+	Default
+	{
+		Tag "KissPanic Melee";
+		Radius 48;
+        Height 48;
+	}
+
+    states
+    {
+        Spawn:
+			BMSM A 25;
+			BMSM A 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			Loop;
+		Death:
+			BMSM F random(10, 20);
+			BMSW F 6 35 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+    }
+}
+
+class KissPanicSam : KissPanicMeleeEnemy
+{
+	Default
+	{
+		Tag "KissPanic Sam";
 	}
 	
+    states
+    {
+        Spawn:
+			BMSM D 25;
+			BMSM D 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			Loop;
+		Death:
+			BMSM I random(10, 20);
+			BMSW I 6 35 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+    }
+}
+
+class KissPanicFran : KissPanicMeleeEnemy
+{
+	// Maybe give a nose laser hitscan or a kiss rocket or idk. Either the defeat sprite doesn't look very defeated so idk
+	Default
+	{
+		Tag "KissPanic Fran";
+	}
+
+    states
+    {
+        Spawn:
+			BMSM B 25;
+			BMSM B 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			Loop;
+		Death:
+			BMSM G random(10, 20);
+			BMSW G 6 35 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+    }
+}
+
+class KissPanicCigfried : KissPanicMeleeEnemy
+{
+	Default
+	{
+		Tag "KissPanic Cigfried";
+	}
+
+    states
+    {
+        Spawn:
+			BMSM A 25;
+			BMSM A 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			Loop;
+		Death:
+			BMSM F random(10, 20);
+			BMSW F 6 35 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+    }
+}
+
+class KissPanicGogo : KissPanicMeleeEnemy
+{
+	Default
+	{
+		Tag "KissPanic Gogo";
+	}
+
+    states
+    {
+        Spawn:
+			BMSM C 25;
+			BMSM C 25 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			Loop;
+		Death:
+			BMSM H random(10, 20);
+			BMSW H 6 35 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12;
+			// Blast by default, Spawn FireyBoom if died in a fire.
+			Stop;
+    }
 }
 
 /*
