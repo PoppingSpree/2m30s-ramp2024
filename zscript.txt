@@ -2361,6 +2361,22 @@ class BMPercivalFollower : Actor
 	}
 }
 
+class BMNPCJean : Actor
+{
+	Default
+	{
+		Tag "Jean NPC";
+	}
+
+	Spawn:
+			BMRB E -1;
+			Loop;
+	Death:
+		BMRB E Random(20, 35);
+		TNT1 A;
+		Stop;
+}
+
 class BMFollowerPercivalEvents : EventHandler
 {
 	override void OnRegister()
@@ -2774,7 +2790,7 @@ class KissPanicFran : KissPanicMeleeEnemy
     }
 }
 
-class KissPanicCigfried : KissPanicMeleeEnemy
+class KissPanicCig : KissPanicMeleeEnemy
 {
 	Default
 	{
@@ -2796,7 +2812,7 @@ class KissPanicCigfried : KissPanicMeleeEnemy
     }
 }
 
-class KissPanicGogo : KissPanicMeleeEnemy
+class KissPanicGo : KissPanicMeleeEnemy
 {
 	Default
 	{
