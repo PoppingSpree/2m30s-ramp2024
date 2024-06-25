@@ -2760,12 +2760,17 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	{
 		if (showLevelWinSplash) 
 		{
-		    // https://zdoom.org/wiki/DrawTexture
-		    // https://zdoom.org/wiki/Structs:TexMan
-		    // https://zdoom.org/wiki/Events_and_handlers
-		    let texID = TexMan.CheckForTexture("SBMENACE");
-		    Screen.DrawTexture(texID, true, 0, 0);
+            DrawCustomLevelTallyOverlay();
 		}
+    }
+
+    ui void DrawCustomLevelTallyOverlay()
+    {
+        // https://zdoom.org/wiki/DrawTexture
+        // https://zdoom.org/wiki/Structs:TexMan
+        // https://zdoom.org/wiki/Events_and_handlers
+        let texID = TexMan.CheckForTexture("SBMENACE");
+        Screen.DrawTexture(texID, true, 0, 0, DTA_Fullscreen, true, DTA_FullScreenScale, FSMode_ScaleToFill);
     }
 }
 
