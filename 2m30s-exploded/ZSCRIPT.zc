@@ -2089,6 +2089,7 @@ class BMPercivalFollower : Actor
 	
 	PercivalFollowerBehaviorState follow_state;
 	bool initialized;
+	bool showDebugText;
 	
 	double jumpStrength;
 	
@@ -2141,7 +2142,7 @@ class BMPercivalFollower : Actor
 		// Dealing with nondeterministic code - https://zdoom.org/wiki/Creating_multiplayer-friendly_ZScript
 		if (!initialized) 
 		{
-			console.Printf("Initializing Percival");
+			if (showDebugText) console.Printf("Initializing Percival");
 			InitPercival();
 		}
 		if (!master) {
@@ -2162,7 +2163,7 @@ class BMPercivalFollower : Actor
 		{
 			if (follow_state != PERCIVAL_FOLLOWER_STATE_IDLE)
 			{
-			    console.printF("Switching to Idle State.");
+			    if (showDebugText) console.printF("Switching to Idle State.");
 			    follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
 			    ClearArrLeader();
             }
@@ -2172,7 +2173,7 @@ class BMPercivalFollower : Actor
 		{
 			if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC)
 			{
-			    console.printF("Switching to Mimic State.");
+			    if (showDebugText) console.printF("Switching to Mimic State.");
     			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
     			ClearArrLeader();
             }
@@ -2181,7 +2182,7 @@ class BMPercivalFollower : Actor
 		{
 			if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP)
 			{
-			    console.printF("Switching to Catch-Up State.");
+			    if (showDebugText) console.printF("Switching to Catch-Up State.");
     			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
     			ClearArrLeader();
             }
@@ -2190,7 +2191,7 @@ class BMPercivalFollower : Actor
 		{
 			if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP)
 			{
-			    console.printF("Switching to Warp State.");
+			    if (showDebugText) console.printF("Switching to Warp State.");
 			    follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
 			    ClearArrLeader();
             }
@@ -2225,13 +2226,13 @@ class BMPercivalFollower : Actor
 	
 	void PercivalFollowerTickIdle()
 	{
-		// console.Printf("Idle...");
+		if (showDebugText) console.Printf("Idle...");
 		A_Chase();
 	}
 	
 	void PercivalFollowerTickMimic()
 	{
-		// console.Printf("Mimic...");
+		if (showDebugText) console.Printf("Mimic...");
 		// We don't want to shuffle memory around, 
 		// So we'll use a carousel style cursor index.
 		
@@ -2239,7 +2240,7 @@ class BMPercivalFollower : Actor
 		
 		// Turns out SetXYZ is mostly good for "assuming" a position, 
 		// not for actually moving. SetOrigin instead.
-		console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		if (showDebugText) console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
 		
 		Vector3 newPos = (arrLeaderPos[arrLeaderPosCurrentIndex].X, arrLeaderPos[arrLeaderPosCurrentIndex].Y, Pos.Z);
 		SetOrigin(newPos, true); 
@@ -2267,11 +2268,11 @@ class BMPercivalFollower : Actor
 	
 	void PercivalFollowerTickCatchUp()
 	{
-	    // console.Printf("Angle before facing: (%.2f))", angle);
+	    if (showDebugText) console.Printf("Angle before facing: (%.2f))", angle);
 	    A_ClearTarget();
-		// console.Printf("CatchUp...");
+		if (showDebugText) console.Printf("CatchUp...");
 		A_FaceMaster();
-		// console.Printf("Angle AFTER facing: (%.2f))", angle);
+		if (showDebugText) console.Printf("Angle AFTER facing: (%.2f))", angle);
 		
 		/*
 		// Figure out where we want to be.
@@ -2299,7 +2300,7 @@ class BMPercivalFollower : Actor
 		*/
 		
 		
-		A_ChangeVelocity(-Speed, 0, Vel.Z, CVF_RELATIVE);
+		A_ChangeVelocity(Speed, 0, Vel.Z, CVF_RELATIVE);
 		if (arrLeaderPos[arrLeaderPosCurrentIndex].Z - Pos.Z > 20) {ActJump();}
 		
 		
@@ -2338,9 +2339,10 @@ class BMPercivalFollower : Actor
 		/*
 		I think the intended paradigm is that I make properties for all of these and set it up in the Default but asfasdfaf
 		*/
+		showDebugText = false;
 		follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
 		
-		jumpStrength = 32.0;
+		jumpStrength = 10.0;
 		
 		distanceFromPlayer = 0.0;
 		mimicRangeMin = 64.0;
