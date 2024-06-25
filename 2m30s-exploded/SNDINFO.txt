@@ -1,0 +1,74 @@
+SBCANCEL SBCANCEL
+SOVRDRV SOVRDRV
+BMCHECKP BMCHECKP
+BMCHECK BMCHECK
+BMTCH BMTCH
+BMCANT BMCANT
+BMOWW BMOWW
+BMOWH BMOWH
+BMNOTHING BMNOTHING
+BMNADA BMNADA
+BMOOF BMOOF
+BMKNOCKO BMKNOCKO
+BMNPOPSF BMNPOPSF
+BMNSQKSF BMNSQKSF
+BMRING BMRING
+BMNDANK BMNDANK
+BMNDASHR BMNDASHR
+BMNHOOKS BMNHOOKS
+BMNPOPBO BMNPOPBO
+BMNPOPBL BMNPOPBL
+BMJUMP BMJUMP
+BMSHOOP BMSHOOP
+SBNEWS SBNEWS
+BMPBLAND BMPBLAND
+BMCMPRSR BMCMPRSR
+BMCMPRON BMCMPRON
+BMSIBOOM BMSIBOOM
+
+// For whatever reason, using these causes the RAMP build to bug out and affect everyone, 
+// so I'm gonna just gonna comment it out and leave it for a standalone build.
+
+
+$playersound           BMPlayerALLCOMERS	male	*pain100	BMOWW
+$playersound           BMPlayerALLCOMERS	male	*pain75		BMOWH
+$playersound           BMPlayerALLCOMERS	male	*pain50		BMKNOCKO
+$playersound           BMPlayerALLCOMERS	male	*pain25		BMOUCH
+$playersound           BMPlayerALLCOMERS	male	*land		BMPBLAND
+$playersound           BMPlayerALLCOMERS	male	*grunt		BMSHOOP
+$playersound           BMPlayerALLCOMERS	male	*jump		BMJUMP
+$playersound           BMPlayerALLCOMERS	male	*usefail	BMNOTHIN
+$playersound           BMPlayerALLCOMERS	male	*splat		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	male	*gibbed		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	male	*death		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	male	*xdeath		BMNPOPBO
+
+$playersound           BMPlayerALLCOMERS	female	*pain100	BMOWW
+$playersound           BMPlayerALLCOMERS	female	*pain75		BMOWH
+$playersound           BMPlayerALLCOMERS	female	*pain50		BMKNOCKO
+$playersound           BMPlayerALLCOMERS	female	*pain25		BMOUCH
+$playersound           BMPlayerALLCOMERS	female	*land		BMPBLAND
+$playersound           BMPlayerALLCOMERS	female	*grunt		BMSHOOP
+$playersound           BMPlayerALLCOMERS	female	*jump		BMJUMP
+$playersound           BMPlayerALLCOMERS	female	*usefail	BMNOTHIN
+$playersound           BMPlayerALLCOMERS	female	*splat		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	female	*gibbed		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	female	*death		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	female	*xdeath		BMNPOPBO
+
+$playersound           BMPlayerALLCOMERS	other	*pain100	BMOWW
+$playersound           BMPlayerALLCOMERS	other	*pain75		BMOWH
+$playersound           BMPlayerALLCOMERS	other	*pain50		BMKNOCKO
+$playersound           BMPlayerALLCOMERS	other	*pain25		BMOUCH
+$playersound           BMPlayerALLCOMERS	other	*land		BMPBLAND
+$playersound           BMPlayerALLCOMERS	other	*grunt		BMSHOOP
+$playersound           BMPlayerALLCOMERS	other	*jump		BMJUMP
+$playersound           BMPlayerALLCOMERS	other	*usefail	BMNOTHIN
+$playersound           BMPlayerALLCOMERS	other	*splat		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	other	*gibbed		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	other	*death		BMNPOPBO
+$playersound           BMPlayerALLCOMERS	other	*xdeath		BMNPOPBO
+
+
+//$musicalias SBATTLE3 "This Is What We Trained For"
+//$musicalias SBATTLE4 "HydroElectric FreeDOOM"

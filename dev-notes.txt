@@ -94,3 +94,31 @@ Probably not _polite_ to do that though, there is a chance of it breaking things
 --
 
 One minor downside is that Spawn uses global offsets, not relative (in contrast to A_SpawnItemEx), so we can’t spawn CacoBaby 64 units in front of CacoDaddy. But that’s not a problem, since we can spawn it and then immediately move it using Warp (a ZScript internal version of the A_Warp function):
+--
+
+Some thoughts: use the checkmove on the squeakers (ignore z) to see if they'll hit a wall. If they do, then we set a flag to turn at the next available opportunity in its states. We do the check every tick by adding the Vel to the Pos for the CheckMove. The reason we don't turn immediately is because we want it to have a delayed response as if it doesn't entirely understand what is happening.
+
+remember you can emit networkEvents via console.
+networkEvent for summoningPercy?
+networkEvent for switching to platformer cam?
+
+Add a sound for Squeakers being defeated.
+
+Clear Percival's follow list when returning to mimic state.
+
+Fix the sounds for the mice girls.
+Kiss Projectile
+
+* "They forgot that I'M HIM!!!" (level start)
+* "i'm biting the bubbles in the bath" (????)
+* "i don't need to see the price tag anyway" (???)
+* "AAAAAAAAAA I’m getting too much money!??!" (powerup???)
+* "This ain't nothin' to me, man" (defeated)
+*
+---
+
+Consider: First thing the player sees is a huge wall that says JUMP with a small hidden door they can open "or don't".
+--
+GlitterDie: On despawn, create 1-5 Glitter actors that have a WillSplit of 1. When those actors expire, they create 1-5 actors of the same type with a WillSplit of 0 and those do not make more.
+
+This might be more resource intensive than using proper particles, but if we only need 25 of them at max, this lets us have those particles be animated.

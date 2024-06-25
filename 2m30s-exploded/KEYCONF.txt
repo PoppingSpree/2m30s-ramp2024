@@ -1,0 +1,3 @@
+addkeysection "HOLLOWROUND / Bubble Menace" HOLLOWROUNDBM
+addmenukey "Dash" "netevent BMActDash"
+addmenukey "FastFall" "netevent BMActFastFall"

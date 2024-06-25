@@ -1,0 +1,86 @@
+Map MAP01 "2m 30s"
+{
+    music = "BMHALFIR"
+	intermusic = "SSYNACK"
+    par = 60
+    sky1 = "BMSKY2", 0.1
+	ExitPic = "SBMENACE"
+	
+	EventHandlers = "BMEventsPlayAsALLCOMERS"
+	// StaticEventHandlers cannot be used here: this is for Map-Specific EventHandlers.
+	
+	// I doubt RAMP allows these next two.
+	//Gravity = 1000.0;
+	//AirControl = 1.0
+	//Lightning
+}
+
+DoomEdNums
+{
+    21501 = "BMHealthPatch"
+	21500 = "BMAutoMap"
+	21502 = "BMCheckpoint"
+	21503 = "BMDoomkini"
+	21504 = "BMBunBons"
+	21505 = "BMAllcomers"
+	21506 = "BMGasket"
+	
+	21507 = "BMRisqueKit"
+	21508 = "BMBlueYum"
+	
+	21509 = "BMPatcher"
+	21510 = "BMDigouter"
+	21511 = "BMBSting"
+	21512 = "BMSerpentine"
+	21513 = "BMFallstreak"
+	21514 = "BMSuperShieldBurst"
+	
+	21515 = "BMStingFrazzle"
+	21516 = "BMTZilly"
+	21517 = "BMWindBullet"
+	
+	21518 = "BMDoomress"	
+	
+	21520 = "BMRedFlower"
+	21521 = "BMSpawnerTankStinger"
+	21522 = "BMSpawnerTankBorkPacon"
+	21523 = "BMSpawnerTankBouncer"
+	21524 = "BMSpawnerTankPinky"
+	21525 = "BMSpawnerTankBMCacoSqueaken"
+	
+	21550 = "BMCacoSqueaken"
+	21551 = "BMCacoBouncer"
+	21552 = "BMBeeStinger"
+	21553 = "BMPinkyPOW"
+	21554 = "BMBorkPaconImp"
+	21555 = "BMNullShellRank3"
+	21556 = "BMNullShellRank2"
+	21557 = "BMNullShellRank1"
+	
+	21558 = "BMBakedBadBigTheCake"
+	
+	21559 = "BMMenaceEnergySource"
+	
+	21560 = "BMTimerDamageSource"
+	
+	21561 = "BMRedDisc"
+	21562 = "BMYellowDisc"
+		
+	21570 = "BMAttackDart"
+	21571 = "BMSuperShieldBurstBurst"
+	21572 = "BMBStingPlayerShot"
+	21573 = "BMBakedBadBigBalls"
+	21574 = "BMCheckSpawnerBossAllClear"
+	21575 = "BMBakedBadBigBallsBigger"
+	
+	21580 = "BMFireyBoom"
+	21581 = "BMPercivalFollower"
+	21582 = "BMDeadlyToilet"
+	21583 = "BMSqueakerBlueChew"
+	21584 = "BMSqueakerRedChew"
+	21585 = "KissPanicSam"
+	21586 = "KissPanicFran"
+	21587 = "KissPanicCig"
+	21588 = "KissPanicGo"
+	21589 = "BMNPCJean"
+}

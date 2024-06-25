@@ -1,0 +1,28 @@
+namespace = "ZDoom";
+
+conversation
+{
+    actor = "BMGasket"; // Not a number!
+    page
+    {
+         name = "Gasket Rena";
+         dialog = "I'm looking for my brother. If you can fight, I'll go with.";
+         choice
+         {
+             text = "Let's Party!";
+             giveitem = "Chaingun";
+             nextpage = 2;
+             nomessage = "I'm not your babysitter. Get a weapon.";
+             cost
+             {
+                 item = "Shotgun";
+                 amount = 1;
+             }
+         }
+    }
+    page
+    {
+         name = "Gasket Rena";
+         dialog = "I'll follow you as far as the forest clearing.";
+    }
+}

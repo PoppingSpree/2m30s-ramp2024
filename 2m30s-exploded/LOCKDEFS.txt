@@ -1,0 +1,15 @@
+Lock 136
+{
+	BMRedDisc
+	Message "You need a Red Key Disc to open this door."
+	RemoteMessage "You need a red card to activate this object"
+	Mapcolor 255 0 0
+}
+
+Lock 135
+{
+	BMYellowDisc
+	Message "You need a Yellow Key Disc to open this door."
+	RemoteMessage "You need a red card to activate this object"
+	Mapcolor 255 0 0
+}

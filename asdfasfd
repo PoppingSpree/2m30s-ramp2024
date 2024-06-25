@@ -1,0 +1,668 @@
+#include "zcommon.acs"
+
+// Map Scope. there's options for World and Global, but since we're doing RAMP we're not touching those. - Ann
+bool lite_build = false;
+
+// Need to store these so we can reset the player before they leave the map.
+int previousAirControl = 0.00390625; // Default is 0.00390625
+int previousGravity = 800.0; // 800 is default for normal doom.
+int previousJumpStrength;
+bool previousMirrorVisibility;
+str previousSoundClass = "";
+
+str previousDeathSound = "";
+str previousPainSound = "";
+
+str bmSoundClass = "bmplayer";
+
+int time_alloted = 150;
+int time_remaining = 150;
+
+int time_remaining_max = 150;
+// 2m 30s.
+
+int t = 0;
+bool stop_countdown = true;
+bool goal_ready = false;
+
+int musicVolume = 1.0;
+bool music_fade_out_end = false;
+bool music_fade_in_end = false;
+
+bool boss_doors_opened = false;
+
+bool spawner_all_clear_blocked = false;
+int subboss_kill_count = 0;
+int subboss_kill_count_goal = 1 + 4 + (4*4); // Boss + 4 spawns + those spawn's subspawns.
+
+// Want to change this so the timer only takes effect after taking Toroko Flower Tea. Not enough time to test that.
+bool took_flowers = true;
+
+bool warned_hurry = false;
+bool warned_rage = false;
+bool warned_kill = false;
+
+int time_threshold_hurry = 30;
+int time_threshold_rage = 20;
+int time_threshold_kill = 10;
+
+str msg_hurry = "Your heart is pounding.";
+str msg_rage = "Your eyes are glowing red...";
+str msg_kill = "KILL";
+
+bool btn_crouch_toggle_down = false;
+
+
+function int abs(int x)
+{
+    if (x < 0)
+        return -x;
+
+    return x;
+}
+
+function int sign(int x)
+{
+    if (x < 0)
+        return -1;
+	if (x > 0)
+        return 1;
+    return 0;
+}
+
+function int fixabs(int x)
+{
+    if (x < 0.0)
+        return -x;
+
+    return x;
+}
+
+function int fixsign(int x)
+{
+    if (x < 0.0)
+        return -1.0;
+	if (x > 0.0)
+        return 1.0;
+    return 0.0;
+}
+
+Script "give_all_players_a_tid" ENTER
+{
+	Thing_ChangeTID(0, 1000 + PlayerNumber()); // This assigns the TID
+
+	//previousGravity = GetActorProperty(1000, APROP_Gravity); // Default is 800? Test it.
+	previousMirrorVisibility = CheckFlag(1000, "INVISIBLEINMIRRORS");
+
+	previousJumpStrength = GetActorProperty(1000, APROP_JumpZ);
+	previousDeathSound = GetActorProperty(1000, APROP_DeathSound);
+	previousPainSound = GetActorProperty(1000, APROP_PainSound);
+	previousSoundClass = GetActorProperty(1000, APROP_SoundClass);
+
+	SetAirControl(1.0);
+	SetGravity(1000.0); // 800 is default for normal doom.
+
+	int jumpNew = 18.0;
+	//print(s:"current JumpZ is ", f:jumpDisplay);
+	//print(s:"new JumpZ is ", f:jumpNew);
+	
+	//Jesus christ I need to mess with the player RIGHT NOW
+
+	SetActorProperty(1000, APROP_JumpZ, jumpNew); // 8 is default in Doom.
+	SetActorProperty(1000, APROP_DeathSound, "BMOOF");
+	SetActorProperty(1000, APROP_PainSound, "BMOWH");
+	SetActorProperty(1000, APROP_SoundClass, bmSoundClass);
+	SetActorFlag(1000, "INVISIBLEINMIRRORS", TRUE);
+
+	TakeInventory("Pistol", 1);
+	TakeInventory("Fist", 1);
+	GiveInventory("BMPatcher", 1);
+}
+
+function void reset_player_stats(void)
+{
+	SetAirControl(previousAirControl);
+	SetGravity(previousGravity);
+	SetActorProperty(1000, APROP_JumpZ, previousJumpStrength);
+	SetActorProperty(1000, APROP_DeathSound, previousDeathSound);
+	SetActorProperty(1000, APROP_PainSound, previousPainSound);
+	SetActorProperty(1000, APROP_SoundClass, previousSoundClass);
+	SetActorFlag(1000, "INVISIBLEINMIRRORS", previousMirrorVisibility);
+	Thing_ChangeTID(1000, 0);
+}
+
+script "switch_bgm_battle" (void)
+{
+	if (lite_build)
+	{
+		LocalSetMusic("SBATTLL3");
+	}
+	else
+	{
+		LocalSetMusic("SBATTLE3");
+	}
+
+}
+
+script "switch_bgm_boss" (void)
+{
+	if (lite_build)
+	{
+		LocalSetMusic("SBATTLL4");
+	}
+	else
+	{
+		LocalSetMusic("SBATTLE4");
+	}
+}
+
+script "switch_bgm_boss3" (void)
+{
+	ACS_NamedExecute("switch_bgm_boss", 0);
+}
+
+script "switch_bgm_results" (void)
+{
+	if (lite_build)
+	{
+		LocalSetMusic("SSYNACK");
+	}
+	else
+	{
+		LocalSetMusic("SSYNACK2");
+	}
+}
+
+script "time_extend_30" (void)
+{
+	PlaySound(0, "BMCHECKP", CHAN_6);
+	if (time_remaining < 0)
+	{
+		time_alloted = t + 30;
+	}
+	else
+	{
+		time_alloted += 30;
+	}
+
+	// This should be for ZScript, not in ACS
+	/*
+	for (int i = 0; i < players.size; i++)
+	{
+		GiveActorInventory(1000 + i, "CellPack", 200);
+		GiveActorInventory(1000 + i, "RocketBox", 200);
+		GiveActorInventory(1000 + i, "ShellBox", 20);
+		Log(s:"Gave Player" .. i:i .. s:"a bunch of junk.");
+	}
+	*/
+
+	/*
+	BMStingFrazzle
+	BMTZilly
+	BMWindBullet
+	*/
+
+	GiveActorInventory(1000, "CellPack", 200);
+	GiveActorInventory(1000, "RocketBox", 200);
+	GiveActorInventory(1000, "ShellBox", 20);
+
+	GiveActorInventory(1000, "BMStingFrazzle", 200);
+	GiveActorInventory(1000, "BMTZilly", 200);
+	GiveActorInventory(1000, "BMWindBullet", 200);
+	//Log(s:"Gave Player0 a bunch of junk.");
+}
+
+script "time_extend_40" (void)
+{
+	PlaySound(0, "BMCHECKP");
+	time_alloted += 40;
+	// Cap based on TimeRemaining?
+}
+
+script "time_extend_60" (void)
+{
+	PlaySound(0, "BMCHECKP");
+	time_alloted += 60;
+}
+
+script "tv_turn_on" (void)
+{
+	Log(s:"Objective: Retrive Mom's old weapons from the armory.");
+
+	int sevenSecs = 35 * 7;
+	//sevenSecs = 10;
+	PlaySound(48, "SBNEWS", CHAN_5, 1.0);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "BMSTATIC");
+	Delay(35);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSA");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSG");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSC");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSH");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSD");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSF");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSE");
+	int scrollTimer = sevenSecs;
+	Scroll_Wall(26, 0, 1, 0, 2);
+	Delay(sevenSecs);
+	Scroll_Wall(26, 0, -sevenSecs, 0, 2);
+	Delay(1);
+	Scroll_Wall(26, 0, 0, 0, 2);
+
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSB");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "BMSTATIC");
+	Delay(sevenSecs);
+	SetLineTexture(26, SIDE_FRONT, TEXTURE_MIDDLE, "SBNEWSI");
+
+	//ACS_NamedExecute("list_objectives", 0);
+}
+
+script "list_objectives" (void)
+{
+	int objectiveWaitTime = 70;
+	Log(s:"Objectives:");
+	Delay(objectiveWaitTime);
+
+	Log(s:"* Retrive Mom's old weapons from the armory.");
+	Delay(objectiveWaitTime);
+
+	Log(s:"* Search for your friend Rhonda at her old hidden workshop.");
+	Delay(objectiveWaitTime);
+
+	Log(s:"* Investigate rumors of the Schoolyard Burrow collapse.");
+	Delay(objectiveWaitTime);
+
+	Log(s:"* Search for refugees at the Everfree Treehouse");
+	Delay(objectiveWaitTime);
+
+	Log(s:"* Survive the Bubble Menace.");
+	Delay(objectiveWaitTime);
+}
+
+function void fn_stop_countdown (void)
+{
+	stop_countdown = true;
+}
+
+function bool is_player_alive(void)
+{
+	bool alive = true;
+
+	If(GetActorProperty(1000, APROP_Health) < 1)
+	{
+		alive = false;
+	}
+
+	return alive;
+}
+
+function void give_blue_key_confetti(void)
+{
+	PrintBold(s:"Blue confetti? How odd.");
+	GiveInventory("BlueCard", 1);
+	// GiveInventory("Blue Keycard", 1);
+}
+
+function void give_pluse_ammo_on_death(void)
+{
+	/*
+	bool ene_alive = true;
+
+	If(GetActorProperty(105, APROP_Health) < 1)
+	{
+		ene_alive = false;
+	}
+
+	if (!ene_alive)
+	{
+
+	}
+	*/
+	// Issue: Need to get the CORRECt specific thing to drop the item. CAn't make them ALL drop it just because one died.
+}
+
+script "music_fade_out" (void)
+{
+	music_fade_in_end = true;
+	music_fade_out_end = false;
+	while(!music_fade_out_end)
+    {
+        musicVolume -= 0.010;
+        SetMusicVolume(musicVolume);
+		if (musicVolume <= 0.0)
+		{
+			musicVolume = 0.0;
+			music_fade_out_end = true;
+		}
+        Delay(1);
+    }
+}
+
+script "music_fade_in" (void)
+{
+	music_fade_out_end = true;
+	music_fade_in_end = false;
+	while(!music_fade_in_end)
+    {
+        musicVolume += 0.010;
+        SetMusicVolume(musicVolume);
+		if (musicVolume >= 1.0)
+		{
+			musicVolume = 1.0;
+			music_fade_in_end = true;
+		}
+        Delay(1);
+    }
+}
+
+function void end_map(void)
+{
+	Exit_Normal(0);
+}
+
+script "reset_player_stats_then_end_map" (void)
+{
+	SetAirControl(previousAirControl);
+	SetGravity(previousGravity);
+	SetActorProperty(1000, APROP_JumpZ, previousJumpStrength); // 8 is default in Doom.
+	SetActorProperty(1000, APROP_DeathSound, previousDeathSound);
+	SetActorProperty(1000, APROP_PainSound, previousPainSound);
+	SetActorProperty(1000, APROP_SoundClass, previousSoundClass);
+	SetActorFlag(1000, "INVISIBLEINMIRRORS", previousMirrorVisibility);
+
+	//reset_player_stats();
+	Exit_Normal(0);
+}
+
+script "start_countdown" (void)
+{
+	if (stop_countdown)
+	{
+		time_alloted = t + time_remaining;
+	}
+	stop_countdown = false;
+}
+
+script "start_countdown_init" (void)
+{
+	time_alloted = t + time_remaining_max;
+	stop_countdown = false;
+}
+
+script "stop_countdown" (void)
+{
+	fn_stop_countdown();
+}
+
+
+// Remider to think of a script as something that starts and stays alive when called with ENTER. Delay keeps it from locking up. - Ann
+script "countdown_timer" ENTER
+{
+	str status_message = "WAIT";
+	while(TRUE)
+	{
+		t = Timer() / 35;
+
+		SetFont("CONFONT");
+		/*HudMessage(d:t/60, s:":", d:(t%60)/10, d:t%10;
+			HUDMSG_PLAIN, 1, CR_LIGHTBLUE, 0.5, 0.05, 2.0);*/
+		if (stop_countdown)
+		{
+			if (!is_player_alive())
+			{
+				status_message = "FLOP";
+			}
+			else if (goal_ready)
+			{
+				status_message = "EXIT";
+			}
+			else
+			{
+				status_message = "WAIT";
+			}
+		}
+		else
+		{
+			status_message = "TIME";
+
+			time_remaining = time_alloted - t;
+			if (time_remaining > time_remaining_max)
+			{
+				time_alloted = t + time_remaining_max;
+			}
+			else if (time_remaining < 0)
+			{
+				//time_remaining = 0;
+				status_message = "KILL";
+			}
+		}
+
+		HudMessage(s:status_message;
+				HUDMSG_PLAIN, 2, CR_LIGHTBLUE, 0.5, 0.02, 2.0);
+
+		SetFont("BIGFONT");
+
+		if (time_remaining < 0)
+		{
+			HudMessage(s:"><";
+				HUDMSG_PLAIN, 1, CR_LIGHTBLUE, 0.5, 0.05, 2.0);
+		}
+		else
+		{
+			HudMessage(d:time_remaining;
+				HUDMSG_PLAIN, 1, CR_LIGHTBLUE, 0.5, 0.05, 2.0);
+		}
+		Delay(5);
+	}
+}
+
+script "countdown_timer_damage_on_time_over" ENTER
+{
+	int tidTimerDamageSource = 80;
+
+	while(TRUE)
+	{
+		if (!is_player_alive()) {Delay(35); continue;}
+        if (!stop_countdown)
+        {
+            if (time_remaining <= 10
+			&& time_remaining > 0
+			&& is_player_alive())
+            {
+                PlaySound(0, "BMRING");
+            }
+            if (time_remaining > time_remaining_max)
+            {
+                time_alloted = t + time_remaining_max;
+            }
+            if (time_remaining < 0)
+            {
+                time_remaining = 0;
+                DamageActor(0, AAPTR_PLAYER1, tidTimerDamageSource, AAPTR_NULL, 10, MOD_WATER);
+            }
+
+			if (is_player_alive())
+			{
+				if (!warned_hurry && time_remaining <= time_threshold_hurry)
+				{
+					warned_hurry = true;
+					Log(s:msg_hurry);
+				}
+				else if (!warned_rage && time_remaining <= time_threshold_rage)
+				{
+					warned_rage = true;
+					Log(s:msg_rage);
+				}
+				else if (!warned_kill && time_remaining <= time_threshold_kill)
+				{
+					warned_kill = true;
+					Log(s:msg_kill);
+				}
+			}
+		}
+		Delay(35);
+	}
+}
+
+script "check_blue_key_enemy_defeated" OPEN
+{
+
+	// We're assuming Tag 100 is set on a Thing that is meant to drop the blue key.
+	// Would be nice to name that.
+	/*
+	while (ThingCount(T_NONE, 100) > 0)
+	{
+		delay(1);
+	}
+	give_blue_key();
+	*/
+
+	// Removed for simplicity. Let's just put a key on the map. Everyone knows how that works.
+}
+
+script "increase_subboss_kill_count" (void)
+{
+	subboss_kill_count += 1;
+}
+
+script "btn_crouch_toggle_down_on" (void)
+{
+	btn_crouch_toggle_down = true;
+}
+
+script "btn_crouch_toggle_down_off" (void)
+{
+	btn_crouch_toggle_down = false;
+}
+
+script "handle_crouch_dash" OPEN
+{
+    int crouch_dash_speed = 77.0;
+    int crouch_dash_cooldown_remaining = 0;
+    int crouch_dash_cooldown_wait = 35; // 35 ticks is 1 second.
+
+	int crouch_dash_active_duration = 7;
+	int crouch_dash_active_rem = 0;
+
+	int crouch_dash_vel_dir_magnitude = 0;
+	int crouch_dash_vel_dir_ratio = 0;
+	int crouch_dash_vel_x = 0;
+	int crouch_dash_vel_y = 0;
+	int crouch_dash_vel_z = 0;
+
+	int fastfall_speed = -64.0;
+
+    bool btn_crouch_down = false;
+
+	bool btn_jump_down = false;
+	bool btn_crouch_hold = false;
+
+    while (true)
+    {
+		if (!is_player_alive()) {Delay(1); continue;}
+        btn_crouch_down = (GetPlayerInput(0, MODINPUT_BUTTONS) & BT_CROUCH) && !(GetPlayerInput(0, INPUT_OLDBUTTONS) & BT_CROUCH);
+		btn_crouch_hold = (GetPlayerInput(0, MODINPUT_BUTTONS) & BT_CROUCH) && (GetPlayerInput(0, INPUT_OLDBUTTONS) & BT_CROUCH);
+		//btn_crouch_toggle_down = (GetActorProperty(1000, APROP_Height) < 55) && !btn_crouch_toggle_down;
+		btn_jump_down = (GetPlayerInput(0, MODINPUT_BUTTONS) & BT_JUMP) && !(GetPlayerInput(0, INPUT_OLDBUTTONS) & BT_JUMP);
+
+		if (btn_crouch_hold)
+		{
+			btn_crouch_down = false;
+			btn_crouch_toggle_down = false;
+		}
+
+		// print(b:btn_crouch_down, s:" : ", d:crouch_dash_cooldown_remaining );
+		// print(s: "Player Height: ", f:(GetActorProperty(1000, APROP_Height)));
+
+		if (crouch_dash_cooldown_remaining == 1)
+        {
+            PlaySound(1000, "BMNDASHR");
+        }
+
+        if (crouch_dash_cooldown_remaining > 0)
+        {
+            crouch_dash_cooldown_remaining -= 1;
+        }
+
+        if ((btn_crouch_down || btn_crouch_toggle_down)
+			&& crouch_dash_cooldown_remaining < 1)
+        {
+
+			int x = GetActorVelX(1000);
+			int y = GetActorVelY(1000);
+			crouch_dash_vel_dir_magnitude = fixabs(x) + fixabs(y);
+
+			if (crouch_dash_vel_dir_magnitude == 0)
+			{
+				// If we want a specific action for trying to dodge while still, it should probably go here. Maybe a backflip? A spot-dodge?
+			}
+			else
+			{
+				crouch_dash_cooldown_remaining = crouch_dash_cooldown_wait + crouch_dash_active_duration;
+
+				crouch_dash_vel_dir_ratio = FixedDiv(x , crouch_dash_vel_dir_magnitude); // x
+				crouch_dash_vel_x = FixedMul(crouch_dash_vel_dir_ratio, crouch_dash_speed);
+
+				crouch_dash_vel_dir_ratio = FixedDiv(y , crouch_dash_vel_dir_magnitude); // y
+				crouch_dash_vel_y = FixedMul(crouch_dash_vel_dir_ratio, crouch_dash_speed);
+
+				crouch_dash_vel_z = 0;
+
+				//SetActorVelocity(1000, x * 10, y * 10, 0, false, false);
+				crouch_dash_active_rem = crouch_dash_active_duration;
+
+				QuakeEx(1000, 2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
+
+				//print(s:"BM_DEBUG_DASH_Base:", f:x, s:", ", f:y, s:", ", f:crouch_dash_vel_dir_magnitude);
+				//print(s:"BM_DEBUG_DASH_Boost:", f:crouch_dash_vel_x, s:", ", f:crouch_dash_vel_y);
+			}
+
+			PlaySound(1000, "BMTCH");
+        }
+
+        else if ((btn_crouch_down || btn_crouch_toggle_down)
+			&& crouch_dash_cooldown_remaining >= 1)
+        {
+            // Play one of the "I Cannot" sounds
+            PlaySound(1000, "BMCANT");
+        }
+
+		if (crouch_dash_active_rem > 0)
+		{
+			crouch_dash_active_rem -= 1;
+			SetActorVelocity(1000, crouch_dash_vel_x, crouch_dash_vel_y, crouch_dash_vel_z, false, false);
+		}
+
+		if (btn_jump_down && (GetActorVelZ(1000) < 0.0))
+        {
+			//SetActorFlag(1000, "SKULLFLY", true); // doesn't work like I wanted, makes the player super floaty.
+			SetActorVelocity(1000, 0, 0, fastfall_speed, false, false);
+			QuakeEx(1000, 2, 2, 2, 10, 0, 10, "", QF_SCALEDOWN);
+		}
+
+        Delay(1);
+    }
+}
+
+script "sink_suddenly" (void)
+{
+	int sinkSpeed = -128;
+	SetActorVelocity(1000,0, 0, sinkSpeed, true, false);
+	//SetGravity()
+}
+
+script "TeleportBunnyToPlayer" (void)
+{
+	int x = GetActorX(1000);
+	int y = GetActorY(1000);
+	int z = GetActorZ(1000);
+
+	SetActorPosition(0, x, y, z, false);
+
+}
