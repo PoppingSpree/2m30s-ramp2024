@@ -3015,6 +3015,65 @@ class BMPinkGlitter : Actor
     }
 }
 
+class BM2m30sDialogueBanks : Thinker
+{
+    int countTimesMapPlayed;
+
+    static BMGlobalVariables Get()
+    {
+        ThinkerIterator it = ThinkerIterator.Create("BMGlobalVariables", STAT_STATIC);
+        let p = BMGlobalVariables(it.Next());
+        if (!p)
+        {
+            p = new("BMGlobalVariables");
+            p.ChangeStatNum(STAT_STATIC);
+        }
+
+        return p;
+    }
+}
+
+enum BMDialogueTopics
+	{
+		BM_TOPIC_NATURE_OF_A_RAMP,
+		BM_TOPIC_JOY_CREATION,
+		BM_TOPIC_FEAR_FAILURE,
+		BM_TOPIC_INSPIRATION,
+		BM_TOPIC_VOICE,
+		BM_TOPIC_INCIDENTAL,
+		BM_TOPIC_FRIENDSHIP,
+		BM_TOPIC_ART_BLOCK,
+		BM_TOPIC_FEEDBACK,
+		BM_TOPIC_CELEBRATION,
+		BM_TOPIC_INTENT,
+		BM_TOPIC_DOODLING,
+		BM_TOPIC_CONVERSATION,
+		BM_TOPIC_SOCIAL,
+
+		BM_TOPIC_1M_PERCI_LEN,
+		BM_TOPIC_30S_PERCI_LEN,
+		BM_TOPIC_0S_PERCI_LEN,
+
+		BM_TOPIC_1M_SOLO_PERCI,
+		BM_TOPIC_30S_SOLO_PERCI,
+		BM_TOPIC_0S_SOLO_PERCI,
+
+		BM_TOPIC_1M_SOLO_LEN,
+		BM_TOPIC_30S_SOLO_LEN,
+		BM_TOPIC_0S_SOLO_LEN,
+
+        BM_TOPIC_1M_CONVINCE_PERCI,
+		BM_TOPIC_30S_CONVINCE_PERCI,
+		BM_TOPIC_0S_CONVINCE_PERCI,
+
+        BM_TOPIC_1M_CONVINCE_PERCI_LEN,
+		BM_TOPIC_30S_CONVINCE_PERCI_LEN,
+		BM_TOPIC_0S_CONVINCE_PERCI_LEN,
+
+		BM_TOPIC_ENDINGS_ARE_BEGINNINGS,
+		BM_TOPIC_FOLLOWER_BONUS,
+	};
+
 /*
 JediMB (she/they) — 06/02/2023 4:55 PM
 Okay, so the way it works is that every MAP inside of a WAD is split up into multiple lumps. What kinds of lumps depends on the format, but for UDMF it's:
