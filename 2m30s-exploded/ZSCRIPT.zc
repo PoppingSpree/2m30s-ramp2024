@@ -1230,7 +1230,7 @@ class BMAllcomers : Actor
         Speed 20;
         Damage 0;
         PainChance 0;
-		Tag "Allco Mers";
+		Tag "Al L Comers (Allco Mers)";
 		
 		Monster;
 		-CountKill;
@@ -1268,7 +1268,7 @@ class BMAllcomers : Actor
 	override void Tick()
     {		
 		// Get the player's position
-		ACS_NamedExecute("TeleportBunnyToPlayer");
+		// ACS_NamedExecute("TeleportBunnyToPlayer");
 
         super.Tick();
     }
@@ -1792,35 +1792,7 @@ class BMTimerDamageSource : Actor
         Spawn:
             TNT1 A -1 bright;
             stop;
-    }
-	
-	override void Tick()
-    {		
-		// We are not trying to disable access to the crouch button, but we 
-		// are canceling out the usual crouch behavior.
-		
-		// This is also clearly not the logical place to put player logic,
-		// but there's only 13 hours left. I'm not gonna make a new class.
-		int verySlightlyCrouchedHeight = 55.0;
-		
-		if (playeringame[0])
-		{
-			if (players[0].Mo.Height < verySlightlyCrouchedHeight) 
-			{
-				//A_LogFloat((players[0].Mo.Height));
-				players[0].Uncrouch();
-				ACS_NamedExecute("btn_crouch_toggle_down_on");
-			}
-			else 
-			{
-				ACS_NamedExecute("btn_crouch_toggle_down_off");
-			}
-		}
-
-        super.Tick();
-    }
-	
-	
+    }	
 }
 
 class BMCheckSpawnerBossAllClear : Actor
@@ -2139,7 +2111,7 @@ class BMPercivalFollower : Actor
 		Scale 0.5;
 		Radius 16;
         Height 12;
-        Speed 20;
+        Speed 4;
 	}
 	
     states
@@ -2188,23 +2160,27 @@ class BMPercivalFollower : Actor
 	{
 		if (distanceFromPlayer < mimicRangeMin) 
 		{
-			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
+			if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
+			ClearArrLeader();
 		} 
 		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
+			ClearArrLeader();
 		} 
 		else if (distanceFromPlayer >= mimicRangeMax && distanceFromPlayer < catchupRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP) {console.printF("Switching to Catch-Up State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
+			ClearArrLeader();
 		} 
 		else if (distanceFromPlayer >= catchupRangeMax) 
 		{
 			//if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP) {console.printF("Switching to Warp State.");}
 			follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
+			ClearArrLeader();
 		}
 	}
 	
@@ -2214,7 +2190,6 @@ class BMPercivalFollower : Actor
 		{
 			case PERCIVAL_FOLLOWER_STATE_IDLE:
 				PercivalFollowerTickIdle();
-				ClearArrLeader();
 				break;
 				
 			case PERCIVAL_FOLLOWER_STATE_MIMIC:
@@ -2223,17 +2198,14 @@ class BMPercivalFollower : Actor
 				
 			case PERCIVAL_FOLLOWER_STATE_CATCH_UP:
 				PercivalFollowerTickCatchUp();
-				ClearArrLeader();
 				break;
 				
 			case PERCIVAL_FOLLOWER_STATE_WARP:
 				PercivalFollowerTickWarp();
-				ClearArrLeader();
 				break;
 				
 			case PERCIVAL_FOLLOWER_STATE_PANIC:
 				PercivalFollowerTickPanic();
-				ClearArrLeader();
 				break;
 		}
 	}
@@ -2282,6 +2254,7 @@ class BMPercivalFollower : Actor
 	
 	void PercivalFollowerTickCatchUp()
 	{
+	    A_ClearTarget();
 		// console.Printf("CatchUp...");
 		A_FaceMaster();
 		
@@ -2388,8 +2361,10 @@ class BMPercivalFollower : Actor
 			// There's probably some way to safely nullcheck the master.Pos
 			// But I will figure it out when I have more time probably.
 			
-			arrLeaderPos[i] = master.Pos;
-			arrLeaderPos[i].Y -= 64;
+			// arrLeaderPos[i] = master.Pos;
+			// arrLeaderPos[i].Y -= 64;
+			
+			arrLeaderPos[i] = Pos;
 		}
 	}
 }
@@ -2574,6 +2549,8 @@ class BMPlayerALLCOMERS : DoomPlayer
 		
 		fastfallSpeed = -64.0;
 		
+		GiveInventory("BMPatcher", 1);
+		
 	}
 	
 	override void Tick()
@@ -2663,9 +2640,12 @@ class BMPlayerALLCOMERS : DoomPlayer
 
 class BMEventsPlayAsALLCOMERS : EventHandler
 {
+    bool showLevelWinSplash;
+    
 	override void OnRegister()
 	{
 		console.printf("Event Handler registered. Will play as Al.");
+		showLevelWinSplash = false;
 	}
 	
 	override void PlayerSpawned(PlayerEvent e)
@@ -2730,6 +2710,11 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	
 	override void NetworkProcess(ConsoleEvent e)
 	{
+	    if (e.Name == "BMActWin") 
+		{
+		    console.Printf("BMActWin");
+		    showLevelWinSplash = !showLevelWinSplash;
+		}
 		if (e.Name == "BMActDash") 
 		{
 			console.Printf("BMActDash");
@@ -2769,7 +2754,19 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		{
 			console.Printf("BMActPlatformingCamera");
 		}
-	}	
+	}
+	
+	override void RenderOverlay(RenderEvent e)
+	{
+		if (showLevelWinSplash) 
+		{
+		    // https://zdoom.org/wiki/DrawTexture
+		    // https://zdoom.org/wiki/Structs:TexMan
+		    // https://zdoom.org/wiki/Events_and_handlers
+		    let texID = TexMan.CheckForTexture("SBMENACE");
+		    Screen.DrawTexture(texID, true, 0, 0);
+		}
+    }
 }
 
 class KissPanicMeleeEnemy : Demon
@@ -2794,9 +2791,17 @@ class KissPanicMeleeEnemy : Demon
 		Death:
 			BMSM F random(10, 20);
 			BMSM F 35 A_SpawnProjectile("BMFireyBoom");
-			TNT1 A 12;
+			TNT1 A 12 Glitterburst();
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
+    }
+    
+    void Glitterburst()
+    {
+        BMPinkGlitter glitter;
+        glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
+        glitter.CountGenerations = 3;
+        glitter.Vel = (0, 0, 2.0);
     }
 }
 
@@ -2821,8 +2826,8 @@ class KissPanicSam : KissPanicMeleeEnemy
 			Goto See;
 		Death:
 			BMSM I random(10, 20);
-			BMSM I 36 A_SpawnProjectile("BMFireyBoom");
-			TNT1 A 12;
+			// BMSM I 36 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12 Glitterburst();
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
@@ -2851,8 +2856,8 @@ class KissPanicFran : KissPanicMeleeEnemy
 		Death:
 			BMSM G random(10, 20);
 			BMSM G random(35, 70);
-			BMSM G 20 A_SpawnProjectile("BMFireyBoom");
-			TNT1 A 12;
+			//BMSM G 20 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12 Glitterburst();
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
@@ -2880,8 +2885,8 @@ class KissPanicCig : KissPanicMeleeEnemy
 		Death:
 			BMSM F random(10, 20);
 			BMSM F 140;
-			BMSM F 20 A_SpawnProjectile("BMFireyBoom");
-			TNT1 A 12;
+			// BMSM F 20 A_SpawnProjectile("BMFireyBoom");
+            TNT1 A 12 Glitterburst();
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
@@ -2909,10 +2914,79 @@ class KissPanicGo : KissPanicMeleeEnemy
 		Death:
 			BMSM H random(10, 20);
 			BMSM H random(5, 45);
-			BMSM H 20 A_SpawnProjectile("BMFireyBoom");
-			TNT1 A 12;
+			// BMSM H 20 A_SpawnProjectile("BMFireyBoom");
+			TNT1 A 12 Glitterburst();
 			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
+    }
+}
+
+class BMPinkGlitter : Actor
+{
+    int countGenerations;
+    int countGlitterPerGeneration;
+    
+    property CountGenerations: countGenerations;
+    property CountGlitterPerGeneration: countGlitterPerGeneration;
+    
+	Default
+	{
+		Tag "Pink Glitter";
+		
+		Height 16;
+		Radius 16;
+		
+		Gravity 0.05;
+		Scale 2.0;
+		RenderStyle "Add";
+		
+		BMPinkGlitter.CountGenerations 0; //Default to zero to avoid someone accidentally making an infinite loop.
+		BMPinkGlitter.CountGlitterPerGeneration 4; //4*4*4 = 64.
+	}
+	
+    States
+    {
+        Spawn:
+			BMPS A Random(1,4);
+			BMPS B Random(1,4);
+			BMPS C Random(0,4);
+			BMPS D Random(1,4);
+			BMPS E Random(0,4);
+			BMPS F Random(1,4);
+			BMPS G Random(0,4);
+			BMPS H Random(1,4);
+        EarlyFade:
+			BMPS I Random(0,4);
+			BMPS J Random(1,4);
+			TNT1 A Random(0,4);
+			TNT1 A 2 Offspring();
+			Stop;
+    }
+    
+    void EarlyEndAttempt()
+    {
+        if (countGenerations >= 3)
+        {
+            SetState(FindState("EarlyFade"));
+        }
+    }
+    
+    void Offspring()
+    {
+        if (countGenerations > 0)
+        {
+            BMPinkGlitter glitter;
+            for (int i = 0; i < countGlitterPerGeneration; i++)
+            {
+                int randomChance = random(0, 10);
+                if (randomChance >= 3)
+                {
+                    glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
+                    glitter.CountGenerations = CountGenerations - 1;
+                    glitter.Vel = (Random(-2.0, 2.0), Random(-2.0, 2.0), Random(1.0, 3.0));
+                }
+            }
+        }
     }
 }
 
