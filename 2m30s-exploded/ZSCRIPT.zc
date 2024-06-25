@@ -1896,64 +1896,64 @@ class BMFireyBoom : DoomImpBall
         Spawn:
 			BMBM B 1 NoDelay A_StartSound("BMSIBOOM");
 			BMBM B 1;
-			BMBM C 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBM D 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBM C 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBM D 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBM C 1;
 			BMBM F 1;
 			BMBM G 1;
 			BMBM H 1;
 			BMBM I 1;
 			BMBM J 1;
-			BMBM K 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBM L 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBM K 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBM L 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBM M 1;
 			BMBM N 1;
 			BMBM O 1;
 			BMBM P 1;
 			BMBM Q 1;
 			BMBM R 1;
-			BMBM S 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBM T 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBM S 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBM T 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBM U 1;
 			BMBM V 1;
 			BMBM W 1;
 			BMBM X 1;
 			BMBM Y 1;
 			BMBM Z 1;
-			BMBN A 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBN B 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBN A 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBN B 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBN C 1;
 			BMBN D 1;
 			BMBN E 1;
 			BMBN F 1;
 			BMBN G 1;
 			BMBN H 1;
-			BMBN I 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBN J 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBN I 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBN J 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBN K 1;
 			BMBN L 1;
 			BMBN M 1;
 			BMBN N 1;
 			BMBN O 1;
 			BMBN P 1;
-			BMBN Q 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBN R 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBN Q 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBN R 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBN S 1;
 			BMBN T 1;
 			BMBN U 1;
 			BMBN V 1;
 			BMBN W 1;
 			BMBN X 1;
-			BMBN Y 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBN Z 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBN Y 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBN Z 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBO A 1;
 			BMBO B 1;
 			BMBO C 1;
 			BMBO D 1;
 			BMBO E 1;
 			BMBO F 1;
-			BMBO G 1 A_Explode(25, 128.0, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0);
-			BMBO H 1 A_RadiusThrust(30 * 100, 128.0, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0, "None");
+			BMBO G 1 A_Explode(25 * Scale.X, 128.0 * Scale.X, XF_NOTMISSILE | XF_CIRCULAR | XF_THRUSTLESS, false, 128.0 * Scale.X);
+			BMBO H 1 A_RadiusThrust(30 * 100 * Scale.X, 128.0 * Scale.X, RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Scale.X, "None");
 			BMBO I 1;
 			BMBO J 1;
 			BMBO K 1 ExplodeMissile();
@@ -2000,6 +2000,9 @@ class BMSqueakerBlueChew : Actor
 {
 	double forwardBounceSpeed;
 	double upwardBounceSpeed;
+	bool willTurn;
+	int turnAngle;
+	bool fuseLit;
 	
 	//Property prefix: Squeaker;
 	Property ForwardBounceSpeed: forwardBounceSpeed;
@@ -2029,22 +2032,97 @@ class BMSqueakerBlueChew : Actor
     {
         Spawn:
 			BMSB A 35;
-			BMSB B 35 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
-			//BMSB B 35 A_ForwardHop();
+			// BMSB B 35 A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+			BMSB B 35 A_ForwardHop();
 			BMSB C 16;
 			BMSB A 16;
 			Loop;
 		Death:
-			BMSW A random(10, 20);
-			BMSW B 6;
-			BMSW C 12;
-			// Blast by default, Spawn FireyBoom if died in a fire.
+			BMSW A random(10, 20) Bright;
+			BMSW B 6 Bright FireOrGlitterburst();
+			BMSW C 12 Bright;
+			TNT1 A 2;
 			Stop;
     }
 	
-	action void A_ForwardHop()
-    {	
-		//A_ChangeVelocity(self.ForwardBounceSpeed, 0.0, self.UpwardBounceSpeed, CVF_RELATIVE);
+	void A_ForwardHop()
+    {
+        if (willTurn)
+        {
+            // Play a Squeak sound, then turn. Will move again next cycle.
+            angle += turnAngle;
+            willTurn = false;
+        }
+        else
+        {
+            A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+        }
+    }
+
+    override void Tick()
+    {
+        Super.Tick();
+        if (turnAngle == 0) {turnAngle = 90;}
+        if (fuseLit)
+        {
+            // THEY PLUMP WHEN YOU COOK 'EM
+            Scale.X += 0.05 + Random(0.00, 0.03);
+            Scale.Y += 0.07 + Random(0.00, 0.03);
+        }
+        if (!CheckMove((Pos.X + Vel.X, Pos.Y + Vel.Y)))
+        {
+            // Console.PrintF("Squeaker WILL TURN");
+            willTurn = true;
+        }
+    }
+
+    override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
+    {
+        int result = Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+
+        // Fire sources are fatal and explosive.
+        if (inflictor is "BMFireyBoom"
+            || inflictor is "ExplosiveBarrel"
+            || inflictor is "FireBall"
+            || inflictor is "DoomImpBall"
+            || inflictor is "ArchvileFire"
+            || inflictor is "FlameMissile"
+            || inflictor is "FireDemonMissile")
+        {
+            fuseLit = true;
+            Console.PrintF("lit");
+            //A_Die();
+            health = 0;
+        }
+        return result;
+    }
+
+    void FireOrGlitterburst()
+    {
+        if (fuseLit) /*Last Damage Source is Fireburst*/
+        {
+            Console.PrintF("STILL lit");
+            let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
+            // VM Seems to crash occasionally if I don't null check this?
+            if (boom)
+            {
+                boom.scale = (4.0, 4.0);
+                Console.PrintF("BOOM!!!");
+            }
+        }
+        else
+        {
+            Console.PrintF("glitter");
+            Glitterburst();
+        }
+    }
+
+    void Glitterburst()
+    {
+        BMPinkGlitter glitter;
+        glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
+        glitter.CountGenerations = 3;
+        glitter.Vel = (0, 0, 2.0);
     }
 }
 
@@ -2068,11 +2146,16 @@ class BMSqueakerRedChew : BMSqueakerBlueChew
 			BMSR A 16;
 			Loop;
 		Death:
-			BMSW A random(10, 20);
-			BMSW B 6;
-			BMSW C 12;
-			// Blast by default, Spawn FireyBoom if died in a fire.
+			BMSW A random(10, 20) Bright;
+			BMSW B 6 Bright FireOrGlitterburst();
+			BMSW C 12 Bright;
 			Stop;
+    }
+
+    override void Tick()
+    {
+        if (turnAngle == 0) {turnAngle = 45;}
+        Super.Tick();
     }
 }
 	
@@ -2408,7 +2491,6 @@ class BMNPCJean : Actor
 			BMSM E random(35, 50);
 			BMSM E 6 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12;
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
 	}
 }
@@ -2802,6 +2884,7 @@ class KissPanicMeleeEnemy : Demon
 		Radius 48;
         Height 48;
 		Scale 0.25;
+		BloodType "BMPinkGlitter";
 	}
 	
     states
@@ -2817,7 +2900,6 @@ class KissPanicMeleeEnemy : Demon
 			BMSM F random(10, 20);
 			BMSM F 35 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12 Glitterburst();
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
     
@@ -2853,7 +2935,6 @@ class KissPanicSam : KissPanicMeleeEnemy
 			BMSM I random(10, 20);
 			// BMSM I 36 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12 Glitterburst();
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
 }
@@ -2883,7 +2964,6 @@ class KissPanicFran : KissPanicMeleeEnemy
 			BMSM G random(35, 70);
 			//BMSM G 20 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12 Glitterburst();
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
 }
@@ -2912,7 +2992,6 @@ class KissPanicCig : KissPanicMeleeEnemy
 			BMSM F 140;
 			// BMSM F 20 A_SpawnProjectile("BMFireyBoom");
             TNT1 A 12 Glitterburst();
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
 }
@@ -2941,7 +3020,6 @@ class KissPanicGo : KissPanicMeleeEnemy
 			BMSM H random(5, 45);
 			// BMSM H 20 A_SpawnProjectile("BMFireyBoom");
 			TNT1 A 12 Glitterburst();
-			// Blast by default, Spawn FireyBoom if died in a fire.
 			Stop;
     }
 }
@@ -2961,7 +3039,7 @@ class BMPinkGlitter : Actor
 		Height 16;
 		Radius 16;
 		
-		Gravity 0.05;
+		Gravity 0.07;
 		Scale 2.0;
 		RenderStyle "Add";
 		
@@ -3015,7 +3093,7 @@ class BMPinkGlitter : Actor
     }
 }
 
-class BM2m30sDialogueBanks : Thinker
+class BMGlobalVariables : Thinker
 {
     int countTimesMapPlayed;
 
@@ -3035,6 +3113,8 @@ class BM2m30sDialogueBanks : Thinker
 
 enum BMDialogueTopics
 	{
+	    BM_TOPIC_INTRO,
+	    BM_TOPIC_RECURRING,
 		BM_TOPIC_NATURE_OF_A_RAMP,
 		BM_TOPIC_JOY_CREATION,
 		BM_TOPIC_FEAR_FAILURE,
