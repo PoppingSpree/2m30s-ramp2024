@@ -1327,7 +1327,7 @@ class BMGasket : Actor
 		//A_Log("Conversation should have started?");
 		//A_Log("I'm looking for my brother. If you can fight, I'll go with.");
 		A_Log("I'm looking for my brother. If you see him, let me know.");
-		StartConversation(50, 1); // If this ever actually works, I'll be stunned.
+		//StartConversation(50, 1); // If this ever actually works, I'll be stunned.
         return true; // Return true if the actor was used.
     }
 }
@@ -3129,29 +3129,132 @@ enum BMDialogueTopics
 		BM_TOPIC_CONVERSATION,
 		BM_TOPIC_SOCIAL,
 
-		BM_TOPIC_1M_PERCI_LEN,
-		BM_TOPIC_30S_PERCI_LEN,
-		BM_TOPIC_0S_PERCI_LEN,
+		BM_TOPIC_1M_PERCI_GASKET,
+		BM_TOPIC_30S_PERCI_GASKET,
+		BM_TOPIC_0S_PERCI_GASKET,
 
 		BM_TOPIC_1M_SOLO_PERCI,
 		BM_TOPIC_30S_SOLO_PERCI,
 		BM_TOPIC_0S_SOLO_PERCI,
 
-		BM_TOPIC_1M_SOLO_LEN,
-		BM_TOPIC_30S_SOLO_LEN,
-		BM_TOPIC_0S_SOLO_LEN,
+		BM_TOPIC_1M_SOLO_GASKET,
+		BM_TOPIC_30S_SOLO_GASKET,
+		BM_TOPIC_0S_SOLO_GASKET,
 
         BM_TOPIC_1M_CONVINCE_PERCI,
 		BM_TOPIC_30S_CONVINCE_PERCI,
 		BM_TOPIC_0S_CONVINCE_PERCI,
 
-        BM_TOPIC_1M_CONVINCE_PERCI_LEN,
-		BM_TOPIC_30S_CONVINCE_PERCI_LEN,
-		BM_TOPIC_0S_CONVINCE_PERCI_LEN,
+        BM_TOPIC_1M_CONVINCE_PERCI_GASKET,
+		BM_TOPIC_30S_CONVINCE_PERCI_GASKET,
+		BM_TOPIC_0S_CONVINCE_PERCI_GASKET,
 
 		BM_TOPIC_ENDINGS_ARE_BEGINNINGS,
 		BM_TOPIC_FOLLOWER_BONUS,
 	};
+
+	class BMNPCGasket2m30s : Actor
+    {
+    	Default
+    	{
+    		DropItem "BMBSting";
+    		Health 500;
+    		PainChance 200;
+    		Radius 16;
+    		Height 56;
+    		Mass 100;
+    		Speed 20;
+    		Damage 0;
+    		PainChance 0;
+    		Activation THINGSPEC_Default;
+    		Monster;
+    		-CountKill;
+    		+NEVERTARGET;
+    		-COUNTKILL;
+    		+NOSPLASHALERT;
+    		+FLOORCLIP;
+    		+JUSTHIT;
+    		+FRIENDLY;
+    		+FORCEXYBILLBOARD;
+    		+USESPECIAL;
+    		-BUMPSPECIAL;
+    		MinMissileChance 150;
+    		MaxStepHeight 16;
+    		MaxDropoffHeight 32;
+    		SeeSound "peasant/sight";
+    		AttackSound "peasant/attack";
+    		PainSound "";
+    		DeathSound "";
+    		HitObituary "%o stepped in front of Gasket's shotgun.";
+    	}
+
+      States
+      {
+    	Spawn:
+    		BMSK A 70 A_LookEX;
+    		Loop;
+    	See:
+    		BMSK A 5 A_FaceTarget;
+    		Loop;
+      }
+
+      class BMNPCPercival2m30s : Actor
+    {
+    	Default
+    	{
+    		DropItem "BMBSting";
+    		Health 500;
+    		PainChance 200;
+    		Radius 16;
+    		Height 56;
+    		Mass 100;
+    		Speed 20;
+    		Damage 0;
+    		PainChance 0;
+    		Activation THINGSPEC_Default;
+    		Monster;
+    		-CountKill;
+    		+NEVERTARGET;
+    		-COUNTKILL;
+    		+NOSPLASHALERT;
+    		+FLOORCLIP;
+    		+JUSTHIT;
+    		+FRIENDLY;
+    		+FORCEXYBILLBOARD;
+    		+USESPECIAL;
+    		-BUMPSPECIAL;
+    		MinMissileChance 150;
+    		MaxStepHeight 16;
+    		MaxDropoffHeight 32;
+    		SeeSound "peasant/sight";
+    		AttackSound "peasant/attack";
+    		PainSound "";
+    		DeathSound "";
+    		HitObituary "%o stepped in front of Gasket's shotgun.";
+    	}
+
+      States
+      {
+    	Spawn:
+    		BMSK A 70 A_LookEX;
+    		Loop;
+    	See:
+    		BMSK A 5 A_FaceTarget;
+    		Loop;
+      }
+
+  override bool Used(Actor user)
+    {
+        // Add your code here to define what happens when the actor is used.
+		//A_Log("attempting to start conversation.");
+		//StartConversation(50, 1);
+		//A_Log("Conversation should have started?");
+		//A_Log("I'm looking for my brother. If you can fight, I'll go with.");
+		A_Log("I'm looking for my brother. If you see him, let me know.");
+		//StartConversation(50, 1); // If this ever actually works, I'll be stunned.
+        return true; // Return true if the actor was used.
+    }
+}
 
 /*
 JediMB (she/they) — 06/02/2023 4:55 PM
