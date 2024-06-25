@@ -2160,27 +2160,40 @@ class BMPercivalFollower : Actor
 	{
 		if (distanceFromPlayer < mimicRangeMin) 
 		{
-			if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
-			follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
-			ClearArrLeader();
-		} 
-		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax) 
+			if (follow_state != PERCIVAL_FOLLOWER_STATE_IDLE)
+			{
+			    console.printF("Switching to Idle State.");
+			    follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
+			    ClearArrLeader();
+            }
+
+		}
+		else if (distanceFromPlayer >= mimicRangeMin && distanceFromPlayer < mimicRangeMax)
 		{
-			//if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC) {console.printF("Switching to Mimic State.");}
-			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
-			ClearArrLeader();
+			if (follow_state != PERCIVAL_FOLLOWER_STATE_MIMIC)
+			{
+			    console.printF("Switching to Mimic State.");
+    			follow_state = PERCIVAL_FOLLOWER_STATE_MIMIC;
+    			ClearArrLeader();
+            }
 		} 
 		else if (distanceFromPlayer >= mimicRangeMax && distanceFromPlayer < catchupRangeMax) 
 		{
-			//if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP) {console.printF("Switching to Catch-Up State.");}
-			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
-			ClearArrLeader();
+			if (follow_state != PERCIVAL_FOLLOWER_STATE_CATCH_UP)
+			{
+			    console.printF("Switching to Catch-Up State.");
+    			follow_state = PERCIVAL_FOLLOWER_STATE_CATCH_UP;
+    			ClearArrLeader();
+            }
 		} 
 		else if (distanceFromPlayer >= catchupRangeMax) 
 		{
-			//if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP) {console.printF("Switching to Warp State.");}
-			follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
-			ClearArrLeader();
+			if (follow_state != PERCIVAL_FOLLOWER_STATE_WARP)
+			{
+			    console.printF("Switching to Warp State.");
+			    follow_state = PERCIVAL_FOLLOWER_STATE_WARP;
+			    ClearArrLeader();
+            }
 		}
 	}
 	
@@ -2226,14 +2239,14 @@ class BMPercivalFollower : Actor
 		
 		// Turns out SetXYZ is mostly good for "assuming" a position, 
 		// not for actually moving. SetOrigin instead.
-		//console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
+		console.Printf("Attempting to move to (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
 		
 		Vector3 newPos = (arrLeaderPos[arrLeaderPosCurrentIndex].X, arrLeaderPos[arrLeaderPosCurrentIndex].Y, Pos.Z);
 		SetOrigin(newPos, true); 
 		
 		if (arrLeaderPos[arrLeaderPosCurrentIndex].Z - Pos.Z > 20) {ActJump();}
 		// Consumed the slot. We can replace it now.
-		arrLeaderPos[arrLeaderPosCurrentIndex] = master.pos;
+		arrLeaderPos[arrLeaderPosCurrentIndex] = master.Pos;
 		
 		arrLeaderPosCurrentIndex++;
 		if (arrLeaderPosCurrentIndex >= arrLeaderPosLength) 
@@ -2254,10 +2267,13 @@ class BMPercivalFollower : Actor
 	
 	void PercivalFollowerTickCatchUp()
 	{
+	    // console.Printf("Angle before facing: (%.2f))", angle);
 	    A_ClearTarget();
 		// console.Printf("CatchUp...");
 		A_FaceMaster();
+		// console.Printf("Angle AFTER facing: (%.2f))", angle);
 		
+		/*
 		// Figure out where we want to be.
 		Vector3 targetPos = master.Pos;
 		
@@ -2280,9 +2296,11 @@ class BMPercivalFollower : Actor
 		{
 			SetOrigin(displacement.Unit() * speed, true); //Unit is a Normalized copy.
 		}
+		*/
 		
 		
-		
+		A_ChangeVelocity(-Speed, 0, Vel.Z, CVF_RELATIVE);
+		if (arrLeaderPos[arrLeaderPosCurrentIndex].Z - Pos.Z > 20) {ActJump();}
 		
 		
 	}
