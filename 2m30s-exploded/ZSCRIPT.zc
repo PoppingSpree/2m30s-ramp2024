@@ -2781,11 +2781,13 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	}
 	
 	//No flipping idea how to deal with this, this is for StaticEventHandler, which I can't use in RAMP2024 I think.
-	/*
 	override bool InputProcess(InputEvent e)
 	{
-		int bind1, bind2 = Bindings.GetKeysForCommand("Crouch");
-		int bind3, bind4 = Bindings.GetKeysForCommand("Toggle Crouch");
+	    // https://zdoom.org/wiki/Customize_controls
+	    // Because I couldn't figure out the + and - meant Button Down and button Release.
+
+		int bind1, bind2 = Bindings.GetKeysForCommand("+Crouch");
+		int bind3, bind4 = Bindings.GetKeysForCommand("+Toggle Crouch");
 		bool intendToDash = e.KeyScan == bind1 || e.KeyScan == bind2;
 		intendToDash = intendToDash || e.KeyScan == bind3 || e.KeyScan == bind4;
 		intendToDash = intendToDash && e.Type == InputEvent.Type_KeyDown;
@@ -2793,19 +2795,15 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		{
 			EventHandler.SendNetworkEvent("BMActDash");
 		}
-	}
-	*/
-	
-	override bool InputProcess(InputEvent e)
-	{
-		int bind1, bind2 = Bindings.GetKeysForCommand("Jump");
-		bool intendToFastFall = e.KeyScan == bind1 || e.KeyScan == bind2;
+
+		int bind1b, bind2b = Bindings.GetKeysForCommand("+Jump");
+		bool intendToFastFall = e.KeyScan == bind1b || e.KeyScan == bind2b;
 		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
-		if (intendToFastFall) 
+		if (intendToDash)
 		{
-			console.Printf("Intending to FastFall. Sending the network message.");
 			EventHandler.SendNetworkEvent("BMActFastFall");
 		}
+
 		return false;
 	}
 	
@@ -3198,7 +3196,20 @@ enum BMDialogueTopics
     		Loop;
       }
 
-      class BMNPCPercival2m30s : Actor
+        override bool Used(Actor user)
+        {
+            // Add your code here to define what happens when the actor is used.
+            //A_Log("attempting to start conversation.");
+            //StartConversation(50, 1);
+            //A_Log("Conversation should have started?");
+            //A_Log("I'm looking for my brother. If you can fight, I'll go with.");
+            A_Log("I'm looking for my brother. If you see him, let me know.");
+            //StartConversation(50, 1); // If this ever actually works, I'll be stunned.
+            return true; // Return true if the actor was used.
+        }
+    }
+
+    class BMNPCPercival2m30s : Actor
     {
     	Default
     	{
@@ -3243,16 +3254,51 @@ enum BMDialogueTopics
     		Loop;
       }
 
-  override bool Used(Actor user)
+    override bool Used(Actor user)
     {
         // Add your code here to define what happens when the actor is used.
-		//A_Log("attempting to start conversation.");
-		//StartConversation(50, 1);
-		//A_Log("Conversation should have started?");
-		//A_Log("I'm looking for my brother. If you can fight, I'll go with.");
-		A_Log("I'm looking for my brother. If you see him, let me know.");
-		//StartConversation(50, 1); // If this ever actually works, I'll be stunned.
+        //A_Log("attempting to start conversation.");
+        //StartConversation(50, 1);
+        //A_Log("Conversation should have started?");
+        //A_Log("I'm looking for my brother. If you can fight, I'll go with.");
+        A_Log("I'm looking for my brother. If you see him, let me know.");
+        //StartConversation(50, 1); // If this ever actually works, I'll be stunned.
         return true; // Return true if the actor was used.
+    }
+}
+
+class BMWorldCountdown : Thinker
+{
+    int timeAsTicks;
+
+    int timeFractionalSecondsPortion;
+    int timeSecondsPortion;
+    int timeMinutesPortion;
+
+
+    void TickDown()
+    {
+        if (timeAsTicks > 0)
+        {
+            SetTimeFromTicks(timeAsTicks - 1);
+        }
+    }
+
+    int SetTimeFromTicks(int ticks)
+    {
+        int ticksPerSecond = 35; // This is just how Doom works.
+        timeAsTicks = ticks;
+        timeMinutesPortion = timeAsTicks / ticksPerSecond / 60;
+        timeSecondsPortion = timeAsTicks % ticksPerSecond;
+        timeFractionalSecondsPortion = timeSecondsPortion / 35;
+        return timeAsTicks;
+    }
+
+    int SetTimeFromSeconds(int seconds)
+    {
+        int ticksPerSecond = 35; // This is just how Doom works.
+        timeAsTicks = seconds * ticksPerSecond;
+        return SetTimeFromTicks(timeAsTicks);
     }
 }
 
