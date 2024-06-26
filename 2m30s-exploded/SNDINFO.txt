@@ -25,10 +25,7 @@ BMPBLAND BMPBLAND
 BMCMPRSR BMCMPRSR
 BMCMPRON BMCMPRON
 BMSIBOOM BMSIBOOM
-
-// For whatever reason, using these causes the RAMP build to bug out and affect everyone, 
-// so I'm gonna just gonna comment it out and leave it for a standalone build.
-
+BMGLITTR BMGLITTR
 
 $playersound           BMPlayerALLCOMERS	male	*pain100	BMOWW
 $playersound           BMPlayerALLCOMERS	male	*pain75		BMOWH

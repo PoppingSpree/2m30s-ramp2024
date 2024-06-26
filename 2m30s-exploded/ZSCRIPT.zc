@@ -578,6 +578,9 @@ class BMBeastBalloonBase : Actor
 		+ACTIVATEMCROSS;
 		+DONTGIB;
 		+NOICEDEATH;
+
+		PainSound "BMNSQKSF";
+        DeathSound "BMNPOPSF";
 	}
 
     states
@@ -3170,7 +3173,7 @@ class BMPinkGlitter : Actor
     {
         Spawn:
 			BMPS A Random(1,4);
-			BMPS B Random(1,4);
+			BMPS B Random(1,4) A_StartSound("BMGLITTR", CHAN_7);
 			BMPS C Random(0,4);
 			BMPS D Random(1,4);
 			BMPS E Random(0,4);
