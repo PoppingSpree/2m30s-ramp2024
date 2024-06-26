@@ -86,6 +86,8 @@ Sound Ideas (Paid):
 Art:
 Sinestesia - https://opengameart.org/content/2d-explosion-animations-frame-by-frame
 
+CafeCaboose - Galactic Riot's ending train.
+
 Ann (PoppingSpree.Dev)
 {
 	Every image in this WAD that isn't credited above. If I included something that shouldn't be there, please poke me.
@@ -152,8 +154,13 @@ class BMCheckpoint : CustomInventory
             BMCH A -1 bright;
             stop;
 		Pickup:
-			TNT1 A 1 bright ACS_NamedExecute("time_extend_30");
+			TNT1 A 1 bright TimeExtend(30);
             stop;
+    }
+
+    action void TimeExtend(int seconds)
+    {
+        Console.PrintF("TODO: Checkpoint");
     }
 }
 
@@ -623,13 +630,7 @@ class BMBeastBalloonBase : Actor
                 // This explosion will probably kill.
                 if (forceFireBurst == 0)
                 {
-                    let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
-                    // VM Seems to crash occasionally if I don't null check this?
-                    if (boom)
-                    {
-                        boom.scale = (4.0, 4.0);
-                        Console.PrintF("BOOM!!!");
-                    }
+                    Fireburst();
                     A_Die();
                 }
             }
@@ -668,19 +669,23 @@ class BMBeastBalloonBase : Actor
     {
         if (fuseLit) /*Last Damage Source is Fireburst*/
         {
-            //Console.PrintF("STILL lit");
-            let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
-            // VM Seems to crash occasionally if I don't null check this?
-            if (boom)
-            {
-                boom.scale = (4.0, 4.0);
-                Console.PrintF("BOOM!!!");
-            }
+            Fireburst();
         }
         else
         {
-            Console.PrintF("glitter");
+            //Console.PrintF("glitter");
             Glitterburst();
+        }
+    }
+
+    void Fireburst()
+    {
+        let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
+        // VM Seems to crash occasionally if I don't null check this?
+        if (boom)
+        {
+            boom.scale = (4.0, 4.0);
+            //Console.PrintF("BOOM!!!");
         }
     }
 
@@ -745,9 +750,9 @@ class BMCacoBouncer : BMBeastBalloonBase
             BMCA I 3 BRIGHT A_Pain;
             Goto See;
         Death:
-            BMCA E 2;
+            BMCA E 2 FireOrGlitterburst();
             BMCA F 2 A_Scream;
-			BMCA G 4 A_Explode(128, 256);
+			BMCA G 4 A_Explode(128, 128);
 			BMCA H 2 A_NoBlocking();
 			BMCA H -1;
 			Stop;
@@ -807,6 +812,7 @@ class BMBeeStinger : BMBeastBalloonBase
 			BMBZ B 2 A_Blast(0, 255, 128.0, 50.0, "BlastEffect", "BlastRadius");
 			BMBZ C 2 A_Explode(64, 128);
 			BMBZ C 2 A_NoBlocking;
+			BMBZ C 2 FireOrGlitterburst();
 			BMBZ C -1;
 			Stop;
 		XDeath:
@@ -814,6 +820,7 @@ class BMBeeStinger : BMBeastBalloonBase
 			BMBZ B 2 A_Scream;
 			BMBZ C 2 A_Explode(64, 128);
 			BMBZ C 2 A_NoBlocking;
+			BMBZ C 2 FireOrGlitterburst();
 			BMBZ C -1;
 			Stop;
 		Raise:
@@ -901,10 +908,11 @@ class BMPinkyPOW : BMBeastBalloonBase
             BMPK A 4 BRIGHT;
             Goto Missile+2;
         Pain:
-            BMPK A 3 BRIGHT;
+            BMPK A 3 BRIGHT FireOrGlitterburst();
             BMPK A 3 BRIGHT A_Pain;
             Goto See;
         Death:
+            BMPK C 2 FireOrGlitterburst();
             BMPK C 2 A_Scream;
 			BMPK D 2 A_Explode(64, 128);
 			BMPK E 2 A_NoBlocking();
@@ -962,7 +970,7 @@ class BMBorkPaconImp : BMBeastBalloonBase
             BMIM A 3 BRIGHT A_Pain;
             Goto See;
         Death:
-            BMIM A 2;
+            BMIM A 2 FireOrGlitterburst();
             BMIM E 2 A_Scream;
 			BMIM C 4 A_Blast(0, 64, 128.0, 50.0, "BlastEffect", "BlastRadius");
             BMIM D -1;
@@ -2210,88 +2218,13 @@ class BMSqueakerBlueChew : BMBeastBalloonBase
 
     override void Tick()
     {
-        Super.Tick();
         if (turnAngle == 0) {turnAngle = 90;}
-        if (fuseLit)
-        {
-            // THEY PLUMP WHEN YOU COOK 'EM
-            if (health > 0)
-            {
-                Scale.X += 0.05 + Random(0.00, 0.03);
-                Scale.Y += 0.07 + Random(0.00, 0.03);
-            }
-
-            if (forceFireBurst > 0)
-            {
-                forceFireBurst--;
-                // Odds are *extremely* high that if the Death state hasn't been triggered already
-                // This explosion will probably kill.
-                if (forceFireBurst == 0)
-                {
-                    let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
-                    // VM Seems to crash occasionally if I don't null check this?
-                    if (boom)
-                    {
-                        boom.scale = (4.0, 4.0);
-                        Console.PrintF("BOOM!!!");
-                    }
-                    A_Die();
-                }
-        }
+        Super.Tick();
         if (!CheckMove((Pos.X + Vel.X, Pos.Y + Vel.Y)))
         {
             // Console.PrintF("Squeaker WILL TURN");
             willTurn = true;
         }
-    }
-
-    override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
-    {
-        int result = Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
-
-        // Fire sources are fatal and explosive.
-        if (inflictor is "BMFireyBoom"
-            || inflictor is "ExplosiveBarrel"
-            || inflictor is "FireBall"
-            || inflictor is "DoomImpBall"
-            || inflictor is "ArchvileFire"
-            || inflictor is "FlameMissile"
-            || inflictor is "FireDemonMissile")
-        {
-            fuseLit = true;
-            Console.PrintF("lit");
-            //A_Die();
-            health = 0;
-        }
-        return result;
-    }
-
-    void FireOrGlitterburst()
-    {
-        if (fuseLit) /*Last Damage Source is Fireburst*/
-        {
-            Console.PrintF("STILL lit");
-            let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
-            // VM Seems to crash occasionally if I don't null check this?
-            if (boom)
-            {
-                boom.scale = (4.0, 4.0);
-                Console.PrintF("BOOM!!!");
-            }
-        }
-        else
-        {
-            Console.PrintF("glitter");
-            Glitterburst();
-        }
-    }
-
-    void Glitterburst()
-    {
-        BMPinkGlitter glitter;
-        glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
-        glitter.CountGenerations = 3;
-        glitter.Vel = (0, 0, 2.0);
     }
 }
 
