@@ -540,7 +540,160 @@ class BMCacoSqueaken : Actor
 	}
 }
 
-class BMCacoBouncer : Actor
+class BMBeastBalloonBase : Actor
+{
+    double forwardBounceSpeed;
+	double upwardBounceSpeed;
+	bool willTurn;
+	int turnAngle;
+	bool fuseLit;
+	int forceFireBurst;
+
+	//Property prefix: Squeaker;
+	Property ForwardBounceSpeed: forwardBounceSpeed;
+	Property UpwardBounceSpeed: upwardBounceSpeed;
+
+	Default
+	{
+		Tag "Squeaker:Blue Chew";
+		Radius 32;
+        Height 32;
+
+		// If you're using custom properties, you must use the base class as the prefix.
+		BMBeastBalloonBase.ForwardBounceSpeed 16.0;
+		BMBeastBalloonBase.UpwardBounceSpeed 12.0;
+
+		Health 10;
+		Speed 0;
+		+SOLID;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+ACTIVATEMCROSS;
+		+DONTGIB;
+		+NOICEDEATH;
+	}
+
+    states
+    {
+        Spawn:
+			BMSB A 35;
+			BMSB B 35 A_ForwardHop();
+			BMSB C 16;
+			BMSB A 16;
+			Loop;
+		Death:
+			BMSW A random(10, 20) Bright A_Scream();
+			BMSW B 6 Bright FireOrGlitterburst();
+			BMSW C 12 Bright;
+			TNT1 A 2;
+			Stop;
+    }
+
+	void A_ForwardHop()
+    {
+        if (willTurn)
+        {
+            // Play a Squeak sound, then turn. Will move again next cycle.
+            angle += turnAngle;
+            willTurn = false;
+        }
+        else
+        {
+            A_ChangeVelocity(ForwardBounceSpeed, 0.0, UpwardBounceSpeed, CVF_RELATIVE);
+        }
+    }
+
+    override void Tick()
+    {
+        Super.Tick();
+        if (turnAngle == 0) {turnAngle = 90;}
+        if (fuseLit)
+        {
+            // THEY PLUMP WHEN YOU COOK 'EM
+            if (health > 0)
+            {
+                Scale.X += 0.05 + Random(0.00, 0.03);
+                Scale.Y += 0.07 + Random(0.00, 0.03);
+            }
+
+            if (forceFireBurst > 0)
+            {
+                forceFireBurst--;
+                // Odds are *extremely* high that if the Death state hasn't been triggered already
+                // This explosion will probably kill.
+                if (forceFireBurst == 0)
+                {
+                    let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
+                    // VM Seems to crash occasionally if I don't null check this?
+                    if (boom)
+                    {
+                        boom.scale = (4.0, 4.0);
+                        Console.PrintF("BOOM!!!");
+                    }
+                    A_Die();
+                }
+            }
+        }
+        if (!CheckMove((Pos.X + Vel.X, Pos.Y + Vel.Y)))
+        {
+            // Console.PrintF("Beast Balloon WILL TURN");
+            // Randomize Turn Angle Here Maybe?
+            willTurn = true;
+        }
+    }
+
+    override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
+    {
+        int result = Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+
+        // Fire sources are fatal and explosive.
+        if (inflictor is "BMFireyBoom"
+            || inflictor is "ExplosiveBarrel"
+            || inflictor is "FireBall"
+            || inflictor is "DoomImpBall"
+            || inflictor is "ArchvileFire"
+            || inflictor is "FlameMissile"
+            || inflictor is "FireDemonMissile")
+        {
+            fuseLit = true;
+            forceFireBurst = 35;
+            Console.PrintF("lit");
+            //A_Die();
+            health = 0;
+        }
+        return result;
+    }
+
+    void FireOrGlitterburst()
+    {
+        if (fuseLit) /*Last Damage Source is Fireburst*/
+        {
+            //Console.PrintF("STILL lit");
+            let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
+            // VM Seems to crash occasionally if I don't null check this?
+            if (boom)
+            {
+                boom.scale = (4.0, 4.0);
+                Console.PrintF("BOOM!!!");
+            }
+        }
+        else
+        {
+            Console.PrintF("glitter");
+            Glitterburst();
+        }
+    }
+
+    void Glitterburst()
+    {
+        BMPinkGlitter glitter;
+        glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
+        glitter.CountGenerations = 3;
+        glitter.Vel = (0, 0, 2.0);
+    }
+}
+
+class BMCacoBouncer : BMBeastBalloonBase
 {
     Default
 	{
@@ -561,11 +714,11 @@ class BMCacoBouncer : Actor
 		+NOBLOOD
 		+SPAWNFLOAT
 		+FORCEXYBILLBOARD;
-		
+
 		BounceType "Doom";
 		WallBounceFactor 0.25;
 		BounceCount 5;
-		
+
         AttackSound "skull/melee";
         PainSound "BMNSQKSF";
         DeathSound "world/barrelx";
@@ -573,7 +726,7 @@ class BMCacoBouncer : Actor
         RenderStyle "SoulTrans";
         Obituary "%o was crushed to bits by a CacoBouncer.";
     }
-    
+
     states
     {
         Spawn:
@@ -601,7 +754,7 @@ class BMCacoBouncer : Actor
 	}
 }
 
-class BMBeeStinger : Actor
+class BMBeeStinger : BMBeastBalloonBase
 {
     Default
 	{
@@ -702,7 +855,7 @@ class BMAttackDart : DoomImpBall
 	}
 }
 
-class BMPinkyPOW : Actor
+class BMPinkyPOW : BMBeastBalloonBase
 {
     Default
 	{
@@ -760,7 +913,7 @@ class BMPinkyPOW : Actor
 	}
 }
 
-class BMBorkPaconImp : Actor
+class BMBorkPaconImp : BMBeastBalloonBase
 {
     Default
 	{
@@ -818,7 +971,7 @@ class BMBorkPaconImp : Actor
 	}
 }
 
-class BMNullShellRank3 : Actor
+class BMNullShellRank3 : BMBeastBalloonBase
 {
 	action void A_NullDeathRank3()
     {	
@@ -1073,6 +1226,7 @@ class BMNullShellRank1 : BMNullShellRank3
 	}
 }
 
+// This does not inhert from BMBeastBalloonBase since well, it's a Baked Bad, not a Beast Balloon.
 class BMBakedBadBigTheCake : Cyberdemon
 {
 	action void A_FireBakedBadBigBalls()
@@ -1172,6 +1326,7 @@ class BMBakedBadBigTheCake : Cyberdemon
 	}
 }
 
+// TODO: This, however, should share BMBeastBalloonBase's vulnerability to fire.
 class BMBakedBadBigBalls : Rocket
 {
  	Default
@@ -1996,13 +2151,8 @@ class BMDeadlyToilet : Actor
     }
 }
 
-class BMSqueakerBlueChew : Actor
+class BMSqueakerBlueChew : BMBeastBalloonBase
 {
-	double forwardBounceSpeed;
-	double upwardBounceSpeed;
-	bool willTurn;
-	int turnAngle;
-	bool fuseLit;
 	
 	//Property prefix: Squeaker;
 	Property ForwardBounceSpeed: forwardBounceSpeed;
@@ -2065,8 +2215,28 @@ class BMSqueakerBlueChew : Actor
         if (fuseLit)
         {
             // THEY PLUMP WHEN YOU COOK 'EM
-            Scale.X += 0.05 + Random(0.00, 0.03);
-            Scale.Y += 0.07 + Random(0.00, 0.03);
+            if (health > 0)
+            {
+                Scale.X += 0.05 + Random(0.00, 0.03);
+                Scale.Y += 0.07 + Random(0.00, 0.03);
+            }
+
+            if (forceFireBurst > 0)
+            {
+                forceFireBurst--;
+                // Odds are *extremely* high that if the Death state hasn't been triggered already
+                // This explosion will probably kill.
+                if (forceFireBurst == 0)
+                {
+                    let boom = BMFireyBoom(A_SpawnProjectile("BMFireyBoom"));
+                    // VM Seems to crash occasionally if I don't null check this?
+                    if (boom)
+                    {
+                        boom.scale = (4.0, 4.0);
+                        Console.PrintF("BOOM!!!");
+                    }
+                    A_Die();
+                }
         }
         if (!CheckMove((Pos.X + Vel.X, Pos.Y + Vel.Y)))
         {
@@ -2241,7 +2411,14 @@ class BMPercivalFollower : Actor
 	
 	void SelectState()
 	{
-		if (distanceFromPlayer < mimicRangeMin) 
+	    if (master.health <= 0)
+	    {
+            // Leader is dead, focus on keeping yourself alive.
+            // With any luck, she may finish the map herself.
+            follow_state = PERCIVAL_FOLLOWER_STATE_IDLE;
+            ClearArrLeader();
+	    }
+		else if (distanceFromPlayer < mimicRangeMin)
 		{
 			if (follow_state != PERCIVAL_FOLLOWER_STATE_IDLE)
 			{
@@ -2799,7 +2976,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		int bind1b, bind2b = Bindings.GetKeysForCommand("+Jump");
 		bool intendToFastFall = e.KeyScan == bind1b || e.KeyScan == bind2b;
 		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
-		if (intendToDash)
+		if (intendToFastFall)
 		{
 			EventHandler.SendNetworkEvent("BMActFastFall");
 		}
