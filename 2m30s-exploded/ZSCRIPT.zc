@@ -2895,19 +2895,31 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	{
 	    // https://zdoom.org/wiki/Customize_controls
 	    // Because I couldn't figure out the + and - meant Button Down and button Release.
+	    // console.Printf("Input: (%s)", e.KeyString);
 
-		int bind1, bind2 = Bindings.GetKeysForCommand("+Crouch");
-		int bind3, bind4 = Bindings.GetKeysForCommand("+Toggle Crouch");
-		bool intendToDash = e.KeyScan == bind1 || e.KeyScan == bind2;
-		intendToDash = intendToDash || e.KeyScan == bind3 || e.KeyScan == bind4;
+		bool intendToDash = false;
+		Array<int> allBindsDash;
+		Bindings.GetAllKeysForCommand(allBindsDash, "+Crouch");
+		for (int i = 0; i < allBindsDash.Size(); i++)
+		{
+            //console.Printf("Checking Bind (%i)", allBindsDash[i]);
+            intendToDash = intendToDash || e.KeyScan == allBindsDash[i];
+		}
 		intendToDash = intendToDash && e.Type == InputEvent.Type_KeyDown;
 		if (intendToDash)
 		{
 			EventHandler.SendNetworkEvent("BMActDash");
 		}
 
-		int bind1b, bind2b = Bindings.GetKeysForCommand("+Jump");
-		bool intendToFastFall = e.KeyScan == bind1b || e.KeyScan == bind2b;
+        bool intendToFastFall = false;
+		Array<int> allBinds;
+		Bindings.GetAllKeysForCommand(allBinds, "+Jump");
+		for (int i = 0; i < allBinds.Size(); i++)
+		{
+            console.Printf("Checking Bind (%i)", allBinds[i]);
+            intendToFastFall = intendToFastFall || e.KeyScan == allBinds[i];
+            console.Printf("IntendFall (%b)", intendToFastFall);
+		}
 		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
 		if (intendToFastFall)
 		{
