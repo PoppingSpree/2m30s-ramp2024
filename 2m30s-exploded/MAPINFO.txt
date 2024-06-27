@@ -84,5 +84,5 @@ DoomEdNums
 	21588 = "KissPanicGo"
 	21589 = "BMNPCJean"
 	21590 = "BMNPCGasket2m30s"
-	21590 = "BMNPCPercival2m30s"
+	21591 = "BMNPCPercival2m30s"
 }

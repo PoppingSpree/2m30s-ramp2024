@@ -663,7 +663,7 @@ class BMBeastBalloonBase : Actor
             forceFireBurst = 35;
             Console.PrintF("lit");
             //A_Die();
-            health = 0;
+            // health = 0;
         }
         return result;
     }
@@ -2179,7 +2179,7 @@ class BMSqueakerBlueChew : BMBeastBalloonBase
 		BMSqueakerBlueChew.ForwardBounceSpeed 16.0;
 		BMSqueakerBlueChew.UpwardBounceSpeed 12.0;
 
-		Health 10;
+		Health 30;
 		Speed 0;
 		+SOLID;
 		+SHOOTABLE;
@@ -2636,6 +2636,11 @@ class BMPlayerALLCOMERS : DoomPlayer
 	
 	double fastfallSpeed;
 
+	name originalSoundClass;
+	name originalPlayerClass;
+
+	int strangeCounter;
+
 	Default
 	{
 		//Tag "Player (Al L. Comers)";
@@ -2670,19 +2675,18 @@ class BMPlayerALLCOMERS : DoomPlayer
 		$playersound           BMPlayerALLCOMERS	male	*xdeath		BMNPOPBO
 		*/
 		
+		Player.SoundClass "BMPlayerALLCOMERS";
 		SeeSound "";
 		PainSound "BMOUCH";
 		DeathSound "BMNPOPBO";
-		ActiveSound "";
-		
-		
-		//Player.WeaponSlot 1, "Fist", "Chainsaw";
-		//Player.WeaponSlot 2, "Pistol";
-		//Player.WeaponSlot 3, "Shotgun", "SuperShotgun";
-		//Player.WeaponSlot 4, "Chaingun";
-		//Player.WeaponSlot 5, "RocketLauncher";
-		//Player.WeaponSlot 6, "PlasmaRifle";
-		//Player.WeaponSlot 7, "BFG9000";
+		// JumpSound "BMJUMP";
+		// UseFailSound "BMNOTHIN";
+
+	/*
+	    SetActorProperty(1000, APROP_DeathSound, "BMOOF");
+	    SetActorProperty(1000, APROP_PainSound, "BMOWH");
+	    SetActorProperty(1000, APROP_SoundClass, bmSoundClass);
+	*/
 	}
 
 	States
@@ -2822,8 +2826,20 @@ class BMPlayerALLCOMERS : DoomPlayer
 		Vel.Z = fastfallSpeed;
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		//A_StartSound("BMTCH");
+		CreateGroundPound();
 	}
-	
+
+	void CreateGroundPound()
+	{
+        BMGroundPound gp = BMGroundPound(Spawn("BMGroundPound"));
+        if (gp)
+        {
+            Console.PrintF("GroundPound Spawned");
+            gp.master = self;
+            gp.target = self;
+        }
+	}
+
 	void TickDash()
 	{
 		if (crouchDashActiveRem > 0)
@@ -2855,6 +2871,12 @@ class BMPlayerALLCOMERS : DoomPlayer
 class BMEventsPlayAsALLCOMERS : EventHandler
 {
     bool showLevelWinSplash;
+    PlayerInfo spawnedPlayerInfo;
+    PlayerPawn originalPlayerPawn;
+    Name originalPlayerClass;
+    Name originalPlayerSoundClass;
+    BMPlayerALLCOMERS allcomers;
+    bool alPrepared;
     
 	override void OnRegister()
 	{
@@ -2862,6 +2884,12 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		showLevelWinSplash = false;
 	}
 	
+	override void WorldUnloaded(WorldEvent e)
+	{
+	    console.printf("HOLLOWROUND Event Handler UnRegistered. Reset all player values to what they were at map start.");
+	    ResetPlayerToPriorState();
+	}
+
 	override void PlayerSpawned(PlayerEvent e)
 	{
 		// Spawn a corresponding new Al player for this spawned player.
@@ -2878,21 +2906,63 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		The previous position of the actor.
 		*/
 		
-		PlayerInfo spawnedPlayerInfo = players[e.PlayerNumber];
-		PlayerPawn originalPlayerPawn = spawnedPlayerInfo.mo;
+		spawnedPlayerInfo = players[e.PlayerNumber];
+		originalPlayerPawn = spawnedPlayerInfo.mo;
+		originalPlayerClass = originalPlayerPawn.GetClassName();
+		originalPlayerSoundClass = originalPlayerPawn.SoundClass;
+
+		if (!allcomers)
+		{
+	       //line was here, moved out of conditional for testing.
+            allcomers = BMPlayerALLCOMERS(Actor.Spawn("BMPlayerALLCOMERS", originalPlayerPawn.Pos));
+		}
+		allcomers.strangeCounter += 1;
 		
-		let allcomers = BMPlayerALLCOMERS(Actor.Spawn("BMPlayerALLCOMERS", originalPlayerPawn.Pos));
+		console.PrintF("Allcomers counter: (%i)", allcomers.strangeCounter);
+
 		spawnedPlayerInfo.mo = allcomers;
 		allcomers.player = spawnedPlayerInfo;
-		originalPlayerPawn.Destroy();
+		//originalPlayerPawn.player = null;
+
+		// Move the old pawn to what we hope is a dedicated safe spot where they can never get away nor die.
+		//originalPlayerPawn.SetOrigin((9999,9999,9999), false);
+
+		originalPlayerPawn.Destroy(); // Maybe there's a safer way than a destroy to revert back to this?
 		
 		// This seems to mostly work. Not sure what to do about player death since this doesn't cause the usual death reaction?
 		
-		//Point the player.mo to the new one we just made.
-		
 		
 	}
-	
+
+    // Gotta make sure I at least TRY to make it unlikely to unintentionally leave this map with modified properties
+    // Or David will probably be annoyed.
+	void ResetPlayerToPriorState()
+	{
+	    if (spawnedPlayerInfo)
+	    {
+	        if (!originalPlayerSoundClass) {originalPlayerSoundClass == "player";}
+	        spawnedPlayerInfo.mo.SoundClass = originalPlayerSoundClass;
+
+	        if (originalPlayerPawn)
+	        {
+	            spawnedPlayerInfo.mo = originalPlayerPawn;
+	            originalPlayerPawn.player = spawnedPlayerInfo;
+	        }
+	        else if (originalPlayerClass)
+	        {
+	            // Commented out because Spawning is not available.
+	            /*
+                originalPlayerClass = PlayerPawn(Spawn(originalPlayerClass, (0,0,0)));
+                spawnedPlayerInfo.mo = originalPlayerPawn;
+	            originalPlayerPawn.player = spawnedPlayerInfo;
+	            */
+
+	        }
+	    }
+	}
+
+
+
 	//No flipping idea how to deal with this, this is for StaticEventHandler, which I can't use in RAMP2024 I think.
 	override bool InputProcess(InputEvent e)
 	{
@@ -2919,9 +2989,9 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		Bindings.GetAllKeysForCommand(allBinds, "+Jump");
 		for (int i = 0; i < allBinds.Size(); i++)
 		{
-            console.Printf("Checking Bind (%i)", allBinds[i]);
+            // console.Printf("Checking Bind (%i)", allBinds[i]);
             intendToFastFall = intendToFastFall || e.KeyScan == allBinds[i];
-            console.Printf("IntendFall (%b)", intendToFastFall);
+            // console.Printf("IntendFall (%b)", intendToFastFall);
 		}
 		intendToFastFall = intendToFastFall && e.Type == InputEvent.Type_KeyDown;
 		if (intendToFastFall)
@@ -2936,12 +3006,12 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	{
 	    if (e.Name == "BMActWin") 
 		{
-		    console.Printf("BMActWin");
+		    // console.Printf("BMActWin");
 		    showLevelWinSplash = !showLevelWinSplash;
 		}
 		if (e.Name == "BMActDash") 
 		{
-			console.Printf("BMActDash");
+			// console.Printf("BMActDash");
 			PlayerPawn theCallingPlayerPawn = players[e.player].mo;
 			BMPlayerALLCOMERS bmpa = null;
 			if (theCallingPlayerPawn is "BMPlayerALLCOMERS") 
@@ -2956,7 +3026,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		}
 		else if (e.Name == "BMActFastFall") 
 		{
-			console.Printf("BMActFastFall");
+			// console.Printf("BMActFastFall");
 			//TODO: refactor and move this repeating junk into a function.
 			PlayerPawn theCallingPlayerPawn = players[e.player].mo;
 			BMPlayerALLCOMERS bmpa = null;
@@ -3425,6 +3495,80 @@ class BMWorldCountdown : Thinker
         timeAsTicks = seconds * ticksPerSecond;
         return SetTimeFromTicks(timeAsTicks);
     }
+}
+
+class BMGroundPound : Actor
+{
+    int minLifespan;
+    property MinLifespan: minLifespan;
+
+	Default
+	{
+		Scale 1.0;
+
+		Radius 16.0;
+        Height 16.0;
+        Speed 0;
+        Damage 200;
+		Alpha 1;
+		SeeSound "";
+		DeathSound "";
+		Tag "Ground Pound Damage Zone";
+		Obituary "%o was FLATTENED by their foe.";
+
+		BMGroundPound.MinLifespan 5;
+	}
+	States
+	{
+	Spawn:
+	    TNT1 A 35;
+		TNT1 A 350; // It is extremely unlikely an entity will be in the air-fall state for more than 10 seconds.
+		Goto Death;
+	Death:
+		TNT1 A 0 PrintDebugDie();
+		Stop;
+	}
+
+	override void Tick()
+	{
+	    // If the creator exists and isn't fast-falling anymore (for example, landed), destroy.
+	    bool willDestroy = (!master || master.Vel.Z >= -1.0);
+	    willDestroy = willDestroy && minLifespan <= 0;
+
+	    if (minLifespan > 0) {minLifespan--;}
+
+	    Super.Tick();
+	    if (!willDestroy)
+        {
+            SetOrigin(master.Pos, true);
+	        Console.PrintF("GroundPound Move");
+        }
+	    else
+	    {
+	        Console.PrintF("GroundPound Detroy");
+            ExplodeMissile();
+        }
+	}
+
+	override bool CanCollideWith(Actor other, bool passive)
+	{
+	    bool collide = super.CanCollideWith(other, passive);
+        if (!passive
+            && collide
+            && master
+            && other != master)
+        {
+            target = master; // This should probably be somewher else.
+            //DoMissileDamage(other);
+            // Since this doesn't destroy, treat it like it's a Ripper.
+        }
+        return collide;
+	}
+
+	void PrintDebugDie()
+	{
+	    Console.PrintF("GP area died from wall/floor???");
+	}
 }
 
 /*
