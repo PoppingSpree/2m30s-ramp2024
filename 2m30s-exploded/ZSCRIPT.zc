@@ -2641,6 +2641,8 @@ class BMPlayerALLCOMERS : DoomPlayer
 
 	int strangeCounter;
 
+	PlayerPawn substitute;
+
 	Default
 	{
 		//Tag "Player (Al L. Comers)";
@@ -2660,33 +2662,8 @@ class BMPlayerALLCOMERS : DoomPlayer
 		Player.CrouchSprite "PLYC";
 		Player.StartItem "BMPatcher";
 		
-		/*
-		$playersound           BMPlayerALLCOMERS	male	*pain100	BMOWW
-		$playersound           BMPlayerALLCOMERS	male	*pain75		BMOWH
-		$playersound           BMPlayerALLCOMERS	male	*pain50		BMKNOCKO
-		$playersound           BMPlayerALLCOMERS	male	*pain25		BMOUCH
-		$playersound           BMPlayerALLCOMERS	male	*land		BMPBLAND
-		$playersound           BMPlayerALLCOMERS	male	*grunt		BMSHOOP
-		$playersound           BMPlayerALLCOMERS	male	*jump		BMJUMP
-		$playersound           BMPlayerALLCOMERS	male	*usefail	BMNOTHIN
-		$playersound           BMPlayerALLCOMERS	male	*splat		BMNPOPBO
-		$playersound           BMPlayerALLCOMERS	male	*gibbed		BMNPOPBO
-		$playersound           BMPlayerALLCOMERS	male	*death		BMNPOPBO
-		$playersound           BMPlayerALLCOMERS	male	*xdeath		BMNPOPBO
-		*/
-		
 		Player.SoundClass "BMPlayerALLCOMERS";
-		SeeSound "";
-		PainSound "BMOUCH";
-		DeathSound "BMNPOPBO";
-		// JumpSound "BMJUMP";
-		// UseFailSound "BMNOTHIN";
 
-	/*
-	    SetActorProperty(1000, APROP_DeathSound, "BMOOF");
-	    SetActorProperty(1000, APROP_PainSound, "BMOWH");
-	    SetActorProperty(1000, APROP_SoundClass, bmSoundClass);
-	*/
 	}
 
 	States
@@ -2745,16 +2722,6 @@ class BMPlayerALLCOMERS : DoomPlayer
 	
 	void InitProperties()
 	{
-		//SetAirControl(1.0);
-		//SetGravity(1000.0);
-		/*
-		// On second thought, let's see if I can get this down to just a playerclass change.
-		// 1000.0/800.0 = 1.25? Let's see that in 
-		if (800.0) //Let's check for the DOOM default before we change it. If it's something else, there's probably a good reason.
-		{
-			level.Gravity = 1000.0; // Okay this would absolutely bug out some other maps designed around the gravity.
-		}
-		*/
 		
 		level.AirControl = 1.0;
 		
@@ -2773,8 +2740,22 @@ class BMPlayerALLCOMERS : DoomPlayer
 	
 	override void Tick()
 	{
+        if (substitute)
+        {
+            bNoInteraction = true;
+            bSolid = false;
+            bShootable = false;
+            // substitute.A_SetRenderStyle(0, STYLE_None);
+            A_SetRenderStyle(0, STYLE_None);
+            Vel = substitute.Vel;
+
+            substitute.soundClass = soundClass;
+            substitute.jumpZ = jumpZ;
+        }
 		super.Tick();
 		TickDash();
+		strangeCounter++;
+		console.PrintF("Allcomers counter: (%i)", strangeCounter);
 	}
 	
 	void HandleDashInput()
@@ -2800,6 +2781,11 @@ class BMPlayerALLCOMERS : DoomPlayer
 		crouchDashActiveRem = crouchDashActiveDuration;
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		A_StartSound("BMTCH");
+		if (substitute)
+		{
+            substitute.A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
+		    substitute.A_StartSound("BMTCH");
+		}
 	}
 	
 	void HandleFastFallInput()
@@ -2810,6 +2796,14 @@ class BMPlayerALLCOMERS : DoomPlayer
 		}
 		else 
 		{
+            if (A_CheckFloor(null))
+            {
+                Vel.Z = JumpZ;
+            }
+            if (substitute && substitute.A_CheckFloor(null))
+            {
+                substitute.Vel.Z = JumpZ;
+            }
 			//A_StartSound("BMCANT");
 		}
 	}
@@ -2826,7 +2820,13 @@ class BMPlayerALLCOMERS : DoomPlayer
 		Vel.Z = fastfallSpeed;
 		A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
 		//A_StartSound("BMTCH");
-		CreateGroundPound();
+        if (substitute)
+		{
+            substitute.A_QuakeEx(2, 2, 2, 25, 0, 10, "", QF_SCALEDOWN);
+            substitute.Vel.X = 0;
+		    substitute.Vel.Y = 0;
+		    substitute.Vel.Z = fastfallSpeed;
+		}
 	}
 
 	void CreateGroundPound()
@@ -2837,6 +2837,11 @@ class BMPlayerALLCOMERS : DoomPlayer
             Console.PrintF("GroundPound Spawned");
             gp.master = self;
             gp.target = self;
+            if (substitute)
+            {
+                gp.master = substitute;
+                gp.target = substitute;
+            }
         }
 	}
 
@@ -2863,8 +2868,10 @@ class BMPlayerALLCOMERS : DoomPlayer
         {
             A_StartSound("BMNDASHR");
         }
-		
-		
+        if (substitute)
+        {
+            substitute.Vel = Vel;
+        }
 	}
 }
 
@@ -2875,6 +2882,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     PlayerPawn originalPlayerPawn;
     Name originalPlayerClass;
     Name originalPlayerSoundClass;
+    double originalPlayerJumpZ;
     BMPlayerALLCOMERS allcomers;
     bool alPrepared;
     
@@ -2906,28 +2914,25 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		The previous position of the actor.
 		*/
 		
+		// Bug that will hopefully just not happen often:
+		// If the player change-maps across maps wwhere this code is used,
+		// their "original" settings will now be copies of the modified settings.
 		spawnedPlayerInfo = players[e.PlayerNumber];
 		originalPlayerPawn = spawnedPlayerInfo.mo;
 		originalPlayerClass = originalPlayerPawn.GetClassName();
 		originalPlayerSoundClass = originalPlayerPawn.SoundClass;
+        originalPlayerJumpZ = originalPlayerPawn.jumpZ;
 
-		if (!allcomers)
+		if (allcomers)
 		{
-	       //line was here, moved out of conditional for testing.
-            allcomers = BMPlayerALLCOMERS(Actor.Spawn("BMPlayerALLCOMERS", originalPlayerPawn.Pos));
+	       allcomers.Destroy();
+
 		}
+		allcomers = BMPlayerALLCOMERS(Actor.Spawn("BMPlayerALLCOMERS", originalPlayerPawn.Pos));
+		allcomers.substitute = originalPlayerPawn;
 		allcomers.strangeCounter += 1;
 		
 		console.PrintF("Allcomers counter: (%i)", allcomers.strangeCounter);
-
-		spawnedPlayerInfo.mo = allcomers;
-		allcomers.player = spawnedPlayerInfo;
-		//originalPlayerPawn.player = null;
-
-		// Move the old pawn to what we hope is a dedicated safe spot where they can never get away nor die.
-		//originalPlayerPawn.SetOrigin((9999,9999,9999), false);
-
-		originalPlayerPawn.Destroy(); // Maybe there's a safer way than a destroy to revert back to this?
 		
 		// This seems to mostly work. Not sure what to do about player death since this doesn't cause the usual death reaction?
 		
@@ -2942,6 +2947,8 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	    {
 	        if (!originalPlayerSoundClass) {originalPlayerSoundClass == "player";}
 	        spawnedPlayerInfo.mo.SoundClass = originalPlayerSoundClass;
+            spawnedPlayerInfo.mo.JumpZ = originalPlayerJumpZ;
+            spawnedPlayerInfo.mo.A_SetRenderStyle(1, STYLE_Normal);
 
 	        if (originalPlayerPawn)
 	        {
@@ -2961,9 +2968,6 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	    }
 	}
 
-
-
-	//No flipping idea how to deal with this, this is for StaticEventHandler, which I can't use in RAMP2024 I think.
 	override bool InputProcess(InputEvent e)
 	{
 	    // https://zdoom.org/wiki/Customize_controls
@@ -3022,6 +3026,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			else 
 			{
 			 console.Printf("This player probably can't airdash?");
+             if (allcomers) {allcomers.HandleDashInput();}
 			}
 		}
 		else if (e.Name == "BMActFastFall") 
@@ -3038,6 +3043,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			else 
 			{
 			 console.Printf("This player probably can't fastfall?");
+             if (allcomers) {allcomers.HandleFastFallInput();}
 			}
 		}
 		else if (e.Name == "BMActSummonPercival") 
@@ -3308,7 +3314,7 @@ class BMGlobalVariables : Thinker
     // 2: Is this Random inclusive of its ends? We should probably explicitly test that.
     BMDialogueTopics SelectRandomTopic()
     {
-        BMDialogueTopics selected = NULL;
+        BMDialogueTopics selected = BM_TOPIC_DEBUG;
         if (topicsAvailable.Size() < 1) 
         {
             ResetAvailableTopics();
@@ -3397,6 +3403,7 @@ class BMGlobalVariables : Thinker
 
 enum BMDialogueTopics
 	{
+	    BM_TOPIC_DEBUG,
 	    BM_TOPIC_INTRO,
 	    BM_TOPIC_RECURRING,
 		BM_TOPIC_NATURE_OF_A_RAMP,
