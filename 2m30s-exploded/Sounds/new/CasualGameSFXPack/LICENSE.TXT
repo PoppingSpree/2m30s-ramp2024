@@ -1,1 +1,9 @@
 Ann purchased these as part of the CasualGameSFXPack via HumbleBundle. These are NOT being sublicensed to you from Ann, and you will have to get your own license if you wish to use these.
+
+The files in question include:
+
+achievment_03.mp3
+electronic_accent_02.mp3
+match3_1a.mp3
+musical_notify_04.mp3
+notify_timer_01.mp3

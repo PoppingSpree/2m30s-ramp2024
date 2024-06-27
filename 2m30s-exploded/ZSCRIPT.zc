@@ -2755,7 +2755,7 @@ class BMPlayerALLCOMERS : DoomPlayer
 		super.Tick();
 		TickDash();
 		strangeCounter++;
-		console.PrintF("Allcomers counter: (%i)", strangeCounter);
+		// console.PrintF("Allcomers counter: (%i)", strangeCounter);
 	}
 	
 	void HandleDashInput()
@@ -3025,7 +3025,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			}
 			else 
 			{
-			 console.Printf("This player probably can't airdash?");
+			 // console.Printf("This player probably can't airdash?");
              if (allcomers) {allcomers.HandleDashInput();}
 			}
 		}
@@ -3042,7 +3042,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			}
 			else 
 			{
-			 console.Printf("This player probably can't fastfall?");
+			 // console.Printf("This player probably can't fastfall?");
              if (allcomers) {allcomers.HandleFastFallInput();}
 			}
 		}
@@ -3357,7 +3357,7 @@ class BMGlobalVariables : Thinker
         
         BMConv GetConv()
         {
-            BMConv conv = new(BMConv);
+            BMConv conv = new('BMConv');
             return conv;
         }
 
@@ -3425,7 +3425,12 @@ class BMConv
         
     }
 
-    BMConv NewConvoByTopic(BMDialogueTopics topic){BMConv newConv; newConv.PopulateConvoByTopic(topic); return newConv;} 
+    BMConv NewConvoByTopic(BMDialogueTopics topic)
+    {
+        BMConv newConv = new('BMConv');
+        newConv.PopulateConvoByTopic(topic); 
+        return newConv;
+    } 
 }
 
 enum BMDialogueTopics
@@ -3562,16 +3567,16 @@ enum BMDialogueTopics
     		AttackSound "peasant/attack";
     		PainSound "";
     		DeathSound "";
-    		HitObituary "%o stepped in front of Gasket's shotgun.";
+    		HitObituary "%o was finished by Percival's pot shots.";
     	}
 
       States
       {
     	Spawn:
-    		BMSK A 70 A_LookEX;
+    		BMPB A 70 A_LookEX;
     		Loop;
     	See:
-    		BMSK A 5 A_FaceTarget;
+    		BMPB A 5 A_FaceTarget;
     		Loop;
       }
 
@@ -3695,6 +3700,143 @@ class BMGroundPound : Actor
 	{
 	    Console.PrintF("GP area died from wall/floor???");
 	}
+}
+
+class BMTelevision : Actor
+{
+    Default
+    {
+        Tag "Deadly Television";
+		DropItem "BMHealthPatch";
+		Health 10;
+		Speed 0;
+		+SOLID;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+ACTIVATEMCROSS;
+		+DONTGIB;
+		+NOICEDEATH;
+    }
+    States
+    {
+        Spawn:
+            BMTV A -1;
+            Stop;
+    }
+}
+
+class BMFakeTextureGlitch : Actor
+{
+    int timerFlipFlat;
+    int timerSec30;
+    int quakeIntensity;
+    sector sectorToChange;
+
+    PlayerPawn playerToShake;
+    
+    Array<TextureID> validTextureIDsForGlitch;
+
+    Default
+    {
+        RenderStyle "None";
+    }
+    States
+    {
+        Spawn:
+            BMBL A 2 NoDelay ResetSecondsTimer();
+            BMBL A -1;
+            stop;
+    }
+
+    void ResetSecondsTimer()
+    {
+        timerSec30 = 35 * 30;
+        quakeIntensity += 1; // Scale is 1 to 9. 
+    }
+    
+    override void Tick()
+    {
+        Super.Tick();
+        if (timerFlipFlat > 0) {timerFlipFlat--;}
+        else 
+        {
+            // Console.PrintF("Glitch#i", timerFlipFlat);
+            GlitchRandomTexture();
+            ResetFlipTimer();
+        }
+
+        if (timerSec30 > 0) {timerSec30--;}
+        else 
+        {
+            // Quake
+            if (!playerToShake)
+            {
+                playerToShake = players[net_arbitrator].mo;
+            }
+
+            playerToShake.A_QuakeEx(quakeIntensity, 35*5, 2, 25, 0, 10, "", QF_SCALEUP | QF_SHAKEONLY);
+
+            // Reset
+            ResetSecondsTimer();
+        }
+    }
+    
+    void GlitchRandomTexture()
+    {
+        sectorToChange = GetRandomWorldSector();
+        if (!sectorToChange) {return;}
+        else
+        {
+            sectorToChange.SetTexture(0, GetRandomValidTextureIdForGlitch());
+
+            int ll = sectorToChange.GetLightLevel();
+            if (ll > 0){ll--;}
+            sectorToChange.ChangeLightLevel(ll);
+        }
+    }
+    
+    TextureID GetRandomValidTextureIdForGlitch()
+    {
+        if (validTextureIDsForGlitch.Size() < 1) 
+        {
+            InitValidTextures();
+        }
+
+        int indTex = Random(0, validTextureIDsForGlitch.Size() - 1);
+        TextureID texID = validTextureIDsForGlitch[indTex];
+        return texID;
+    }
+    
+    void InitValidTextures()
+    {
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVBARS")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVGRN")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSTATIC")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("TNT1A0")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK01")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SBCNCEPT")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("TNT1A0")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("TNT1A0")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("TNT1A0")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
+    }
+    
+    sector GetRandomWorldSector()
+    {
+        int ind = Random(0, level.sectors.Size() -1);
+        return level.sectors[ind];
+    }
+    
+    void ResetFlipTimer()
+    {
+        timerFlipFlat = Random(20, 45);
+        timerFlipFlat = 2;
+    }
 }
 
 /*

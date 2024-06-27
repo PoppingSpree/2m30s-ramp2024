@@ -1,10 +1,12 @@
-Map MAP01 "2m 30s"
+Map MAP01 "2m30sDebug"
 {
     music = "BMHALFIR"
 	intermusic = "SSYNACK"
     par = 60
     sky1 = "BMSKY2", 0.1
 	ExitPic = "SBMENACE"
+	Next = "MAPAFTER"
+	LevelNum = 02
 	
 	EventHandlers = "BMEventsPlayAsALLCOMERS"
 	// StaticEventHandlers cannot be used here: this is for Map-Specific EventHandlers.
@@ -85,4 +87,22 @@ DoomEdNums
 	21589 = "BMNPCJean"
 	21590 = "BMNPCGasket2m30s"
 	21591 = "BMNPCPercival2m30s"
+	21592 = "BMFakeTextureGlitch"
 }
+
+// Remove these maps when submitting to RAMP2024
+Map MAPAFTER "2m 30s"
+{
+    music = "BMHALFIR"
+    intermusic = "SSYNACK"
+    par = 60
+    sky1 = "BMSKY2", 0.1
+    ExitPic = "SBMENACE"
+    LevelNum = 01
+    Next = "Map01"
+    
+    EventHandlers = "BMEventsPlayAsALLCOMERS"
+    // StaticEventHandlers cannot be used here: this is for Map-Specific EventHandlers.
+    Lightning
+}
+//
