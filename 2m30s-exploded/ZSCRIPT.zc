@@ -3354,8 +3354,17 @@ class BMGlobalVariables : Thinker
         topicsPossible.Push(BM_TOPIC_SOCIAL);
         
     }
+        
+        BMConv GetConv()
+        {
+            BMConv conv = new(BMConv);
+            return conv;
+        }
 
         //topicsPossible.Push(BM_TOPIC_INTRO);
+        // I wanted to do a system with dynamic "voice" changing and character labels, but 
+        // For lack of time and a concern about memory waste,
+        // We'll just set these values in simple string arrays.
 
 
         //topicsPossible.Push(BM_TOPIC_RECURRING);
@@ -3399,6 +3408,24 @@ class BMGlobalVariables : Thinker
 
 
 
+}
+
+class BMConv
+{
+    int lineIndex;
+    int countdownLineDisplay;
+    array<string> lines;
+
+    void DisplayLine(){}
+    void AdvanceLine(){}
+    void InterruptLine(string interruption){} // Maybe have a version that takes multiple lines?
+    
+    void PopulateConvoByTopic(BMDialogueTopics topic)
+    {
+        
+    }
+
+    BMConv NewConvoByTopic(BMDialogueTopics topic){BMConv newConv; newConv.PopulateConvoByTopic(topic); return newConv;} 
 }
 
 enum BMDialogueTopics
