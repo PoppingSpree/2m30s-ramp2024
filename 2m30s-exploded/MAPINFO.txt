@@ -88,6 +88,7 @@ DoomEdNums
 	21590 = "BMNPCGasket2m30s"
 	21591 = "BMNPCPercival2m30s"
 	21592 = "BMFakeTextureGlitch"
+	21593 = "BMTelevision"
 }
 
 // Remove these maps when submitting to RAMP2024
