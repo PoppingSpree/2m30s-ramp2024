@@ -3288,6 +3288,8 @@ class BMPinkGlitter : Actor
 class BMGlobalVariables : Thinker
 {
     int countTimesMapPlayed;
+    Array<BMDialogueTopics> topicsPossible;
+    Array<BMDialogueTopics> topicsAvailable;
 
     static BMGlobalVariables Get()
     {
@@ -3300,6 +3302,71 @@ class BMGlobalVariables : Thinker
         }
 
         return p;
+    }
+    
+    // 1: Do we need to be careful that Delete doesn't result in null gaps without decreasing the size?
+    // 2: Is this Random inclusive of its ends? We should probably explicitly test that.
+    BMDialogueTopics SelectRandomTopic()
+    {
+        BMDialogueTopics selected = NULL;
+        if (topicsAvailable.Size() < 1) 
+        {
+            ResetAvailableTopics();
+        }
+        
+        int indexSelected = Random(0, topicsAvailable.Size() - 1);
+        
+        selected = topicsAvailable[indexSelected];
+        
+        return selected;
+    }
+    
+    void ResetAvailableTopics()
+    {
+        if (topicsPossible.Size() < 1)
+        {
+            InitTopicsPossible();
+        }
+        topicsAvailable.Copy(topicsPossible);
+    }
+    
+    void InitTopicsPossible()
+    {
+        topicsPossible.Push(BM_TOPIC_INTRO);
+        topicsPossible.Push(BM_TOPIC_RECURRING);
+        topicsPossible.Push(BM_TOPIC_NATURE_OF_A_RAMP);
+        topicsPossible.Push(BM_TOPIC_JOY_CREATION);
+        topicsPossible.Push(BM_TOPIC_FEAR_FAILURE);
+        topicsPossible.Push(BM_TOPIC_INSPIRATION);
+        topicsPossible.Push(BM_TOPIC_VOICE);
+        topicsPossible.Push(BM_TOPIC_INCIDENTAL);
+        topicsPossible.Push(BM_TOPIC_FRIENDSHIP);
+        topicsPossible.Push(BM_TOPIC_ART_BLOCK);
+        topicsPossible.Push(BM_TOPIC_FEEDBACK);
+        topicsPossible.Push(BM_TOPIC_CELEBRATION);
+        topicsPossible.Push(BM_TOPIC_INTENT);
+        topicsPossible.Push(BM_TOPIC_DOODLING);
+        topicsPossible.Push(BM_TOPIC_CONVERSATION);
+        topicsPossible.Push(BM_TOPIC_SOCIAL);
+/*
+        topicsPossible.Push(BM_TOPIC_1M_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_30S_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_0S_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_1M_SOLO_PERCI);
+        topicsPossible.Push(BM_TOPIC_30S_SOLO_PERCI);
+        topicsPossible.Push(BM_TOPIC_0S_SOLO_PERCI);
+        topicsPossible.Push(BM_TOPIC_1M_SOLO_GASKET);
+        topicsPossible.Push(BM_TOPIC_30S_SOLO_GASKET);
+        topicsPossible.Push(BM_TOPIC_0S_SOLO_GASKET);
+        topicsPossible.Push(BM_TOPIC_1M_CONVINCE_PERCI);
+        topicsPossible.Push(BM_TOPIC_30S_CONVINCE_PERCI);
+        topicsPossible.Push(BM_TOPIC_0S_CONVINCE_PERCI);
+        topicsPossible.Push(BM_TOPIC_1M_CONVINCE_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_30S_CONVINCE_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_0S_CONVINCE_PERCI_GASKET);
+        topicsPossible.Push(BM_TOPIC_ENDINGS_ARE_BEGINNINGS);
+        topicsPossible.Push(BM_TOPIC_FOLLOWER_BONUS);*/
+        
     }
 }
 
