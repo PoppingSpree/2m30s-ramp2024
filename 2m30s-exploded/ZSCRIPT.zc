@@ -2889,6 +2889,8 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     TextureID dialogueBG;
 
     BMGlobalVariables bmg;
+
+    HUDfont bmDoomFontBad;
     
 	override void OnRegister()
 	{
@@ -3073,24 +3075,32 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	
 	override void RenderOverlay(RenderEvent e)
 	{
+        let bmDoomFont = HUDFont.Create(smallfont);
+        statusbar.DrawString(bmDoomFont, "IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING ", (0,0),
+        statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
+
 		if (showLevelWinSplash) 
 		{
             DrawCustomLevelTallyOverlay();
 		}
 
-        if (bmg && bmg.convoDirector && bmg.convoDirector.display) 
+        if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) 
         {
             // Draw the backing texture.
-            dialogueBG = TexMan.CheckForTexture("SBNEWSI");
-            statusbar.DrawTexture(dialogueBG, (0,0), 0, 0.666);
+            //dialogueBG = 
+            TextureID test = TexMan.CheckForTexture("SBNEWSI");
+            statusbar.DrawTexture(test, (0,0), statusbar.DI_SCREEN_LEFT_TOP, 1.0);
 
             // Draw the text.
-            int fontHeight = smallfont.mFont.GetHeight();
-            int fontLineOffset = 0; 
-
-            statusbar.DrawString(smallfont, "Debug WOW THIS IS SOME TEXT", (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+            //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
+            int fontHeight = bmDoomFont.mFont.GetHeight();
+            int fontLineOffset = 0;
             fontLineOffset += fontHeight + 2;
-            statusbar.DrawString(smallfont, bmg.convoDirector, (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+
+            statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (0,fontLineOffset),
+            statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
+            fontLineOffset += fontHeight + 2;
+            statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
 
         }
     }
@@ -3328,11 +3338,9 @@ class BMConversationDirector230 : Actor
     bool show;
     BMConv currentConvo;
 
-    +NOINTERACTION
-
     Default
     {
-
+        +NOINTERACTION;
     }
     States
     {
@@ -3505,9 +3513,13 @@ class BMConv
 
     string GetCurrentLine()
     {
-        if (!lines[lineIndex]) 
+        if (lineIndex >= lines.Size() || !lines[lineIndex]) 
         {
-            return lineIndex;
+            return "";
+        }
+        else 
+        {
+            return lines[lineIndex];
         }
     }
     void AdvanceLine()
@@ -3525,7 +3537,7 @@ class BMConv
     // Maybe have a version that takes multiple lines? I don't have time now.
     void InterruptLine(string interruption)
     {
-        lines.Insert(lineIndex+1);
+        lines.Insert(lineIndex+1, interruption);
         AdvanceLine();
 
     }
@@ -3840,9 +3852,12 @@ class BMTelevision : Actor
 class BMFakeTextureGlitch : Actor
 {
     int timerFlipFlat;
+    int countdownChangeSky;
     int timerSec30;
     int quakeIntensity;
     sector sectorToChange;
+
+    Array<string> skies;
 
     PlayerPawn playerToShake;
     
@@ -3887,7 +3902,7 @@ class BMFakeTextureGlitch : Actor
             }
 
             int fiveSeconds = 35 * 5;
-            playerToShake.A_QuakeEx(quakeIntensity, quakeIntensity, quakeIntensity / 1.3, fiveSeconds, 0, 10, "", QF_SHAKEONLY | QF_SCALEUP); // 
+            playerToShake.A_QuakeEx(quakeIntensity, quakeIntensity, quakeIntensity / 1.3, fiveSeconds + (quakeIntensity*35), 0, 10, "", QF_SHAKEONLY | QF_SCALEUP); // 
 
             // Reset
             ResetSecondsTimer();
@@ -3902,11 +3917,69 @@ class BMFakeTextureGlitch : Actor
         {
             sectorToChange.SetTexture(0, GetRandomValidTextureIdForGlitch());
 
+            
+
             int ll = sectorToChange.GetLightLevel();
             if (ll > 20){ll -= 10;}
             else {ll += 31;}
             sectorToChange.ChangeLightLevel(ll);
+
+            countdownChangeSky--;
+            if (countdownChangeSky < 1) 
+            { 
+                countdownChangeSky = 35;
+
+                TextureId skyID;
+                if (quakeIntensity > 3) 
+                {
+                    skyID = TexMan.CheckForTexture("BMPINK01");
+                    GlitchSides(skyID);
+                }
+                else if (quakeIntensity > 4) 
+                {
+                    skyID = TexMan.CheckForTexture("BMPINK02");
+                    GlitchSides(skyID);
+                }
+                else
+                {
+                    skyID = PickRandomSky();
+                }
+                level.ChangeSky(skyID, skyID);
+            }
+
+            if (quakeIntensity > 3) 
+            {
+                let sideTexID = TexMan.CheckForTexture("BMPINK01");
+                GlitchSides(sideTexID);
+            }
+            else if (quakeIntensity > 4) 
+            {
+                let sideTexID = TexMan.CheckForTexture("BMPINK02");
+                GlitchSides(sideTexID);
+            }
         }
+    }
+
+    void GlitchSides(TextureID textureID)
+    {
+        let currentSide = GetRandomWorldSide();
+        currentSide.SetTexture(Side.bottom, textureID);
+        currentSide.SetTexture(Side.mid, textureID);
+        currentSide.SetTexture(Side.top, textureID);
+        
+
+/*    TextureID GetTexture(int which)
+
+    Returns a TextureID of the texture at the top/mid/bottom of the sidedef.
+
+        int which — part of the sidedef (Side.top, Side.mid or Side.bottom)
+
+    void SetTexture(int which, TextureID tex)
+
+    Changes the texture at the top/mid/bottom of the sidedef to the provided TextureID.
+
+        int which — part of the sidedef (Side.top, Side.mid or Side.bottom)
+        TextureID tex — the texture to use*/
     }
     
     TextureID GetRandomValidTextureIdForGlitch()
@@ -3918,8 +3991,24 @@ class BMFakeTextureGlitch : Actor
 
         int indTex = Random(0, validTextureIDsForGlitch.Size() - 1);
         TextureID texID = validTextureIDsForGlitch[indTex];
+        if (quakeIntensity>=3) {texID = TexMan.CheckForTexture("BMPINK01");}
+        if (quakeIntensity>=4) {texID = TexMan.CheckForTexture("BMPINK02");}
         return texID;
     }
+
+        void InitSkies()
+        {
+            //skies.Push("OWARPB01");
+            skies.Push("BMHVRED2");
+            skies.Push("SBNEWSI");
+            skies.Push("BMPINK02");
+        }
+        TextureID PickRandomSky()
+        {
+            if (skies.Size() < 1) {InitSkies();}
+            int ind = Random(0, skies.Size() - 1);
+            return TexMan.CheckForTexture(skies[ind]); 
+        }
     
     void InitValidTextures()
     {
@@ -3930,8 +4019,6 @@ class BMFakeTextureGlitch : Actor
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK01")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SBCNCEPT")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SLIME01")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("LAVA1")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("NUKAGE1")));
@@ -3952,6 +4039,12 @@ class BMFakeTextureGlitch : Actor
     {
         int ind = Random(0, level.sectors.Size() -1);
         return level.sectors[ind];
+    }
+
+    Side GetRandomWorldSide()
+    {
+        int ind = Random(0, level.sides.Size() -1);
+        return level.sides[ind];
     }
     
     void ResetFlipTimer()
