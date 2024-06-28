@@ -2878,6 +2878,9 @@ class BMPlayerALLCOMERS : DoomPlayer
 class BMEventsPlayAsALLCOMERS : EventHandler
 {
     bool showLevelWinSplash;
+    bool showPinkFade;
+    double pinkFadeOpacity;
+    int postFade;
     PlayerInfo spawnedPlayerInfo;
     PlayerPawn originalPlayerPawn;
     Name originalPlayerClass;
@@ -2889,8 +2892,6 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     TextureID dialogueBG;
 
     BMGlobalVariables bmg;
-
-    HUDfont bmDoomFontBad;
     
 	override void OnRegister()
 	{
@@ -3071,25 +3072,60 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		{
 			console.Printf("BMActPlatformingCamera");
 		}
+        else if (e.Name == "BMActFadeToPink") 
+		{
+			console.Printf("BMActFadeToPink");
+            StartFadeToPink();
+		}
 	}
+
+    void StartFadeToPink()
+    {
+        ;
+        // Spawn a HUGE glitter fountain
+        // Reset opacity to 0;
+        showPinkFade = true;
+        pinkFadeOpacity = 0.0;
+        // Flag that we want to draw and increase it every tick.
+    }
+
+    void DrawFadeToPink()
+    {
+        ;
+        // Spawn a HUGE glitter fountain
+        // Reset opacity to 0;
+        showPinkFade = true;
+        if (pinkFadeOpacity <= 1) {pinkFadeOpacity += 0.1; postFade = 0;}
+        else {pinkFadeOpacity = 1; postFade++;}
+
+        if (postFade == 70) {Exit_Normal(0);}
+        // Probably increase some kind of post-full-fade counter before we end level?
+        // Flag that we want to draw and increase it every tick.
+    }
 	
 	override void RenderOverlay(RenderEvent e)
 	{
         let bmDoomFont = HUDFont.Create(smallfont);
-        statusbar.DrawString(bmDoomFont, "IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING ", (0,0),
-        statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
+        string strDebug = String.Format("(%i) IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING", postFade); 
+        statusbar.DrawString(bmDoomFont, strDebug, (0,0),
+        statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 400);
 
 		if (showLevelWinSplash) 
 		{
             DrawCustomLevelTallyOverlay();
 		}
+        
+        // if (bmg) {Console.PrintF("bmg is NOT null.");}
+        // if (bmg && bmg.convoDirector) {Console.PrintF("convoDirector is NOT null.");}
+        // if (bmg && bmg.convoDirector && bmg.convoDirector.show ) {Console.PrintF("convoDirector SHOW is SET");}
+        // if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) {Console.PrintF("All Convo Checks Passed.");}
 
         if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) 
         {
             // Draw the backing texture.
             //dialogueBG = 
             TextureID test = TexMan.CheckForTexture("SBNEWSI");
-            statusbar.DrawTexture(test, (0,0), statusbar.DI_SCREEN_LEFT_TOP, 1.0);
+            statusbar.DrawTexture(test, (-320,-320), statusbar.DI_SCREEN_LEFT_TOP, 0.666, (-1, -1), (1, -10));
 
             // Draw the text.
             //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
@@ -3097,10 +3133,11 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             int fontLineOffset = 0;
             fontLineOffset += fontHeight + 2;
 
-            statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (0,fontLineOffset),
+            statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (32,32 + fontLineOffset),
             statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
             fontLineOffset += fontHeight + 2;
             statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+            bmg.convoDirector.currentConvo.AdvanceLineCountdown();
 
         }
     }
@@ -3354,6 +3391,7 @@ class BMConversationDirector230 : Actor
         if (!initialized) 
         {
             InitDirector();
+            Console.PrintF("Initializing Director.");
         }
     }
 
@@ -3367,6 +3405,7 @@ class BMConversationDirector230 : Actor
         }
 
         currentConvo = BMConv.NewConvoByTopic(BM_TOPIC_INTRO);
+        initialized = true;
     }
 }
 
@@ -3510,6 +3549,7 @@ class BMConv
     int lineIndex;
     int countdownLineDisplay;
     array<string> lines;
+    int oneSec;
 
     string GetCurrentLine()
     {
@@ -3519,15 +3559,26 @@ class BMConv
         }
         else 
         {
-            return lines[lineIndex];
+            string result = lines[lineIndex];
+            return result;
         }
+    }
+    void AdvanceLineCountdown()
+    {
+        countdownLineDisplay--;
+        if (countdownLineDisplay < 1){AdvanceLine();}
     }
     void AdvanceLine()
     {
         lineIndex++;
-        if (lineIndex >= lines.Size() || !lines[lineIndex]) 
+        if (lineIndex < lines.Size() && lines[lineIndex]) 
         {
-            Console.PrintF("Convo is done, you should probably handle that or something idk");
+            countdownLineDisplay = CountdownLengthFromStrLen(lines[0]);
+        }
+        if (!lines[lineIndex]) 
+        {
+            Console.PrintF("Convo is done, you should probably handle that on next countdown end or something idk");
+            lineIndex = 0;
         }
         else
         {
@@ -3544,6 +3595,7 @@ class BMConv
     
     void PopulateConvoByTopic(BMDialogueTopics topic)
     {
+    
         switch (topic)
         {
             case BM_TOPIC_INTRO:
@@ -3557,11 +3609,18 @@ class BMConv
                 lines.Push("AAAAAA YOU BROKE THE CUTSCENE TEXT DIALOGUE SYSTEM THINGY THIS CLSOE OT THEEND OF RAMP WHAT DID YOU DO"); 
             break;
         }
+        countdownLineDisplay = CountdownLengthFromStrLen(lines[0]);
+    }
+
+    int CountdownLengthFromStrLen(string str)
+    {
+        return 35 + lines[0].Length() * 5;
     }
 
     static BMConv NewConvoByTopic(BMDialogueTopics topic)
     {
         BMConv newConv = new('BMConv');
+        newConv.oneSec = 35;
         newConv.PopulateConvoByTopic(topic); 
         return newConv;
     } 
@@ -3831,7 +3890,8 @@ class BMTelevision : Actor
     {
         Tag "Deadly Television";
 		DropItem "BMHealthPatch";
-		Health 10;
+		Health 20;
+        Scale 0.25;
 		Speed 0;
 		+SOLID;
 		+SHOOTABLE;
