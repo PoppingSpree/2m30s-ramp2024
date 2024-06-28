@@ -3994,6 +3994,7 @@ class BMFakeTextureGlitch : Actor
     int countdownChangeSky;
     int timerSec30;
     int quakeIntensity;
+    int totalTicks;
     sector sectorToChange;
 
     Array<string> skies;
@@ -4023,6 +4024,7 @@ class BMFakeTextureGlitch : Actor
     override void Tick()
     {
         Super.Tick();
+        totalTicks++;
         if (timerFlipFlat > 0) {timerFlipFlat--;}
         else 
         {
@@ -4045,6 +4047,21 @@ class BMFakeTextureGlitch : Actor
 
             // Reset
             ResetSecondsTimer();
+        }
+
+        if (totalTicks == 35 * (150))
+        {
+            Console.PrintF("Time's up! Time to move on to the next RAMP.");
+            let eventHandler = BMEventsPlayAsALLCOMERS(EventHandler.Find("BMEventsPlayAsALLCOMERS"));
+            if (!eventHandler) 
+            {
+                Console.PrintF("Failed to get reference to PlayableAllcomers event handler.");
+            }
+            else 
+            {
+                Console.PrintF("Got the event handler. Fade things out.");
+                eventHandler.StartFadeToPink();
+            }
         }
     }
     
