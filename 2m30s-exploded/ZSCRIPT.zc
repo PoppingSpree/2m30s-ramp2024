@@ -2724,6 +2724,7 @@ class BMPlayerALLCOMERS : DoomPlayer
 	{
 		
 		level.AirControl = 1.0;
+        level.AirFriction = 0.95; 
 		
 		crouchDashSpeed = 77.0;
 		crouchDashCooldownRemaining = 0;
@@ -3077,28 +3078,40 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 			console.Printf("BMActFadeToPink");
             StartFadeToPink();
 		}
+        else if (e.Name == "BMActFinalGlitterFountain") 
+		{
+			console.Printf("BMActFinalGlitterFountain");
+        // Spawn a HUGE glitter fountain
+        //    if I had more time and felt clever, I'd loop through every remaining entity and do the fountains but I don't.
+         
+        let glitter = BMPinkGlitter(Actor.Spawn("BMPinkGlitter", Pos));
+        glitter.CountGenerations = 6; // This is probably going to be at least 500, possibly thousands...
+		}
 	}
 
     void StartFadeToPink()
     {
-        ;
         // Spawn a HUGE glitter fountain
         // Reset opacity to 0;
         showPinkFade = true;
-        pinkFadeOpacity = 0.0;
         // Flag that we want to draw and increase it every tick.
+        pinkFadeOpacity = 0.0;
+        
+        EventHandler.SendNetworkEvent("BMActFastFall");
+        
     }
 
     void DrawFadeToPink()
     {
-        ;
-        // Spawn a HUGE glitter fountain
         // Reset opacity to 0;
         showPinkFade = true;
-        if (pinkFadeOpacity <= 1) {pinkFadeOpacity += 0.1; postFade = 0;}
+        if (pinkFadeOpacity <= 1) {pinkFadeOpacity += 0.02; postFade = 0;}
         else {pinkFadeOpacity = 1; postFade++;}
 
         if (postFade == 70) {Exit_Normal(0);}
+
+        let texID = TexMan.CheckForTexture("BMPINK01");
+        Screen.DrawTexture(texID, true, 0, 0, DTA_Fullscreen, true, DTA_FullScreenScale, FSMode_ScaleToFill);
         // Probably increase some kind of post-full-fade counter before we end level?
         // Flag that we want to draw and increase it every tick.
     }
@@ -4081,6 +4094,10 @@ class BMFakeTextureGlitch : Actor
     void GlitchSides(TextureID textureID)
     {
         let currentSide = GetRandomWorldSide();
+        //Special protections for the train exit:
+        if (currentSide.linedef.Index() == 1230  
+            || currentSide.linedef.Index() == 1222
+            || currentSide.linedef.Index() == 1228 ) {return;}
         currentSide.SetTexture(Side.bottom, textureID);
         currentSide.SetTexture(Side.mid, textureID);
         currentSide.SetTexture(Side.top, textureID);
@@ -4117,9 +4134,12 @@ class BMFakeTextureGlitch : Actor
         void InitSkies()
         {
             //skies.Push("OWARPB01");
+            skies.Push("SKY1");
+            skies.Push("SKY2");
+            skies.Push("SKY3");            
             skies.Push("BMHVRED2");
             skies.Push("SBNEWSI");
-            skies.Push("BMPINK02");
+            //skies.Push("BMPINK02"); Pink shy should not be part of the normal set.
         }
         TextureID PickRandomSky()
         {
@@ -4134,7 +4154,7 @@ class BMFakeTextureGlitch : Actor
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVBARS")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVGRN")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSTATIC")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK01")));
+        // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK01"))); Not in random pool.
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SBCNCEPT")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SLIME01")));
@@ -4144,8 +4164,8 @@ class BMFakeTextureGlitch : Actor
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OLAVAE01")));
 
 
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
+        // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
+        // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
 
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1"))); //This was TNT1A0, but I don't think that works here.
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1")));
@@ -4168,7 +4188,7 @@ class BMFakeTextureGlitch : Actor
     void ResetFlipTimer()
     {
         timerFlipFlat = Random(20, 45);
-        timerFlipFlat = 2;
+        if (quakeIntensity > 2) {timerFlipFlat = 2;}
     }
 }
 
