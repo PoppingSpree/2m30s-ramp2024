@@ -2050,8 +2050,8 @@ class BMFireyBoom : DoomImpBall
 		+Ripper;
 		RenderStyle "Normal";
 		Alpha 1;
-		SeeSound "BMSIBOOM";
-		DeathSound "BMSIBOOM";
+		SeeSound "";
+		DeathSound "";
 		+NOINTERACTION
 		
         Obituary "%o was caught in an explosion.";
@@ -2197,6 +2197,8 @@ class BMSqueakerBlueChew : BMBeastBalloonBase
 			BMSB C 16;
 			BMSB A 16;
 			Loop;
+        Pain:
+            BMSW A 6 A_Pain;
 		Death:
 			BMSW A random(10, 20) Bright A_Scream();
 			BMSW B 6 Bright FireOrGlitterburst();
@@ -2250,6 +2252,8 @@ class BMSqueakerRedChew : BMSqueakerBlueChew
 			BMSR C 8;
 			BMSR A 8;
 			Loop;
+        Pain:
+            BMSW A 6 A_Pain;
 		Death:
 			BMSW A random(10, 20) Bright A_Scream();
 			BMSW B 6 Bright FireOrGlitterburst();
@@ -3122,9 +3126,9 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	override void RenderOverlay(RenderEvent e)
 	{
         let bmDoomFont = HUDFont.Create(smallfont);
-        string strDebug = String.Format("(%i) IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING", postFade); 
-        statusbar.DrawString(bmDoomFont, strDebug, (0,0),
-        statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 400);
+        //string strDebug = String.Format("(%i) IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING IS THIS THING WORKING", postFade); 
+        //statusbar.DrawString(bmDoomFont, strDebug, (0,0),
+        //statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 400);
 
 		if (showLevelWinSplash) 
 		{
@@ -3141,7 +3145,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             // Draw the backing texture.
             //dialogueBG = 
             TextureID test = TexMan.CheckForTexture("SBNEWSI");
-            statusbar.DrawTexture(test, (-320,-320), statusbar.DI_SCREEN_LEFT_TOP, 0.666, (-1, -1), (1, -10));
+            Screen.DrawTexture(test, true, 32,32, DTA_Alpha, 0.666, DTA_FullScreenScale, FSMode_ScaleToFit);
 
             // Draw the text.
             //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
@@ -3149,11 +3153,15 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             int fontLineOffset = 0;
             fontLineOffset += fontHeight + 2;
 
-            statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (32,32 + fontLineOffset),
-            statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
+            //This draws where I want, but no built in wordwrap...
+            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "Debug WOW THIS IS SOME TEXT", DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
+
+
+            //statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (32,32 + fontLineOffset),
+            //statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
             fontLineOffset += fontHeight + 2;
-            statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
-            bmg.convoDirector.currentConvo.AdvanceLineCountdown();
+            //statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+            // bmg.convoDirector.currentConvo.AdvanceLineCountdown(); DON'T DO THIS HERE, this runs on DRAW SPEED, which is much more variable than GameTicks.
 
         }
     }
@@ -3464,6 +3472,7 @@ class BMConversationDirector230 : Actor
             InitDirector();
             Console.PrintF("Initializing Director.");
         }
+        if (currentConvo) {currentConvo.AdvanceLineCountdown();}
     }
 
     void InitDirector()
@@ -4063,6 +4072,7 @@ class BMFakeTextureGlitch : Actor
                 eventHandler.StartFadeToPink();
             }
         }
+        DarkenSector(GetRandomWorldSector(), 5);
     }
     
     void GlitchRandomTexture()
@@ -4072,13 +4082,7 @@ class BMFakeTextureGlitch : Actor
         else
         {
             sectorToChange.SetTexture(0, GetRandomValidTextureIdForGlitch());
-
-            
-
-            int ll = sectorToChange.GetLightLevel();
-            if (ll > 20){ll -= 10;}
-            else {ll += 31;}
-            sectorToChange.ChangeLightLevel(ll);
+            DarkenSector(sectorToChange);
 
             countdownChangeSky--;
             if (countdownChangeSky < 1) 
@@ -4114,6 +4118,15 @@ class BMFakeTextureGlitch : Actor
                 GlitchSides(sideTexID);
             }
         }
+    }
+
+    void DarkenSector(sector sectorToChange, int rate = 10)
+    {
+        int ll = sectorToChange.GetLightLevel();
+        if (ll > 20){ll -= rate;}
+        else {ll += 31;}
+        // Had a careless error here: ChangeLightLevel is relative, Set is not.
+        sectorToChange.SetLightLevel(ll);
     }
 
     void GlitchSides(TextureID textureID)
@@ -4214,6 +4227,7 @@ class BMFakeTextureGlitch : Actor
     {
         timerFlipFlat = Random(20, 45);
         if (quakeIntensity > 2) {timerFlipFlat = 2;}
+        if (quakeIntensity > 3) {timerFlipFlat = 1;}
     }
 }
 
