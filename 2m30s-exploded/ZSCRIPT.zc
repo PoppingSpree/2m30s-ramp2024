@@ -2885,11 +2885,16 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     double originalPlayerJumpZ;
     BMPlayerALLCOMERS allcomers;
     bool alPrepared;
+
+    TextureID dialogueBG;
+
+    BMGlobalVariables bmg;
     
 	override void OnRegister()
 	{
 		console.printf("Event Handler registered. Will play as Al.");
 		showLevelWinSplash = false;
+        bmg = BMGlobalVariables.Get();
 	}
 	
 	override void WorldUnloaded(WorldEvent e)
@@ -3072,6 +3077,22 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		{
             DrawCustomLevelTallyOverlay();
 		}
+
+        if (bmg && bmg.convoDirector && bmg.convoDirector.display) 
+        {
+            // Draw the backing texture.
+            dialogueBG = TexMan.CheckForTexture("SBNEWSI");
+            statusbar.DrawTexture(dialogueBG, (0,0), 0, 0.666);
+
+            // Draw the text.
+            int fontHeight = smallfont.mFont.GetHeight();
+            int fontLineOffset = 0; 
+
+            statusbar.DrawString(smallfont, "Debug WOW THIS IS SOME TEXT", (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+            fontLineOffset += fontHeight + 2;
+            statusbar.DrawString(smallfont, bmg.convoDirector, (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
+
+        }
     }
 
     ui void DrawCustomLevelTallyOverlay()
@@ -3301,11 +3322,54 @@ class BMPinkGlitter : Actor
     }
 }
 
+class BMConversationDirector230 : Actor
+{
+    bool initialized;
+    bool show;
+    BMConv currentConvo;
+
+    +NOINTERACTION
+
+    Default
+    {
+
+    }
+    States
+    {
+        Spawn:
+            BMBL A -1;
+            Stop;
+    }
+
+    override void Tick()
+    {
+        if (!initialized) 
+        {
+            InitDirector();
+        }
+    }
+
+    void InitDirector()
+    {
+        show = true;
+        let bmg = BMGlobalVariables.Get();
+        if (bmg) 
+        {
+            bmg.convoDirector = self;
+        }
+
+        currentConvo = BMConv.NewConvoByTopic(BM_TOPIC_INTRO);
+    }
+}
+
+
 class BMGlobalVariables : Thinker
 {
     int countTimesMapPlayed;
     Array<BMDialogueTopics> topicsPossible;
     Array<BMDialogueTopics> topicsAvailable;
+
+    BMConversationDirector230 convoDirector;
 
     static BMGlobalVariables Get()
     {
@@ -3364,6 +3428,19 @@ class BMGlobalVariables : Thinker
         topicsPossible.Push(BM_TOPIC_SOCIAL);
         
     }
+
+        int DetermineTopicTime(string str)
+        {
+            // One second minimum, add more time for each letter.
+            int ticks = 35;
+            // https://zdoom.org/wiki/String#CodePointCount
+            int numChars = str.CodePointCount();
+            
+            ticks += numChars * 10;            
+
+            return ticks;
+            
+        }
         
         BMConv GetConv()
         {
@@ -3426,16 +3503,51 @@ class BMConv
     int countdownLineDisplay;
     array<string> lines;
 
-    void DisplayLine(){}
-    void AdvanceLine(){}
-    void InterruptLine(string interruption){} // Maybe have a version that takes multiple lines?
+    string GetCurrentLine()
+    {
+        if (!lines[lineIndex]) 
+        {
+            return lineIndex;
+        }
+    }
+    void AdvanceLine()
+    {
+        lineIndex++;
+        if (lineIndex >= lines.Size() || !lines[lineIndex]) 
+        {
+            Console.PrintF("Convo is done, you should probably handle that or something idk");
+        }
+        else
+        {
+        }
+    }
+
+    // Maybe have a version that takes multiple lines? I don't have time now.
+    void InterruptLine(string interruption)
+    {
+        lines.Insert(lineIndex+1);
+        AdvanceLine();
+
+    }
     
     void PopulateConvoByTopic(BMDialogueTopics topic)
     {
-        
+        switch (topic)
+        {
+            case BM_TOPIC_INTRO:
+                lines.Clear();
+                lines.Push("Percival: I think I hear something. Someone new, I mean.");
+                lines.Push("Gasket: Huh? Really? Can't remember the last time there's been another person here. Not that it matters much. Not much time left.");
+            break;
+
+            default:
+                lines.Clear();
+                lines.Push("AAAAAA YOU BROKE THE CUTSCENE TEXT DIALOGUE SYSTEM THINGY THIS CLSOE OT THEEND OF RAMP WHAT DID YOU DO"); 
+            break;
+        }
     }
 
-    BMConv NewConvoByTopic(BMDialogueTopics topic)
+    static BMConv NewConvoByTopic(BMDialogueTopics topic)
     {
         BMConv newConv = new('BMConv');
         newConv.PopulateConvoByTopic(topic); 
@@ -3715,6 +3827,7 @@ class BMTelevision : Actor
 		+ACTIVATEMCROSS;
 		+DONTGIB;
 		+NOICEDEATH;
+        -CountKill;
     }
     States
     {
