@@ -2050,8 +2050,8 @@ class BMFireyBoom : DoomImpBall
 		+Ripper;
 		RenderStyle "Normal";
 		Alpha 1;
-		SeeSound "";
-		DeathSound "";
+		SeeSound "BMSIBOOM";
+		DeathSound "BMSIBOOM";
 		+NOINTERACTION
 		
         Obituary "%o was caught in an explosion.";
@@ -2060,7 +2060,7 @@ class BMFireyBoom : DoomImpBall
     states
     {
         Spawn:
-			BMBM B 1 NoDelay A_StartSound("BMSIBOOM", CHAN_5);
+			BMBM B 1 NoDelay A_StartSound("BMSIBOOM");
 			BMBM B 1 ;
 			BMBM C 1 A_Explode(15 * Max(Scale.X/2.0, 1), 128.0 * Max(Scale.X/2.0, 1), XF_NOTMISSILE | XF_CIRCULAR, false, 128.0 * Max(Scale.X/2.0, 1));
 			BMBM D 1 ;//A_RadiusThrust(30 * 100 * Max(Scale.X/2.0, 1), 128.0 * Max(Scale.X/2.0, 1), RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Max(Scale.X/2.0, 1), "None");
@@ -3605,6 +3605,7 @@ class BMConv
     int countdownLineDisplay;
     array<string> lines;
     int oneSec;
+    bool currentConvoDone;
 
     string GetCurrentLine()
     {
@@ -3630,13 +3631,12 @@ class BMConv
         {
             countdownLineDisplay = CountdownLengthFromStrLen(lines[0]);
         }
-        if (!lines[lineIndex]) 
-        {
-            Console.PrintF("Convo is done, you should probably handle that on next countdown end or something idk");
-            lineIndex = 0;
-        }
         else
         {
+            Console.PrintF("Convo is done, you should probably handle that on next countdown end or something idk");
+            countdownLineDisplay = 9999*9999;
+            lineIndex = 0;
+            currentConvoDone = true;
         }
     }
 
@@ -3665,11 +3665,14 @@ class BMConv
             break;
         }
         countdownLineDisplay = CountdownLengthFromStrLen(lines[0]);
+        currentConvoDone = false;
     }
 
     int CountdownLengthFromStrLen(string str)
     {
-        return 35 + lines[0].Length() * 5;
+        int ticks = 70 + lines[0].Length() * 5;
+        console.PrintF("Ticks For Talk: %i", ticks);
+        return ticks;
     }
 
     static BMConv NewConvoByTopic(BMDialogueTopics topic)
