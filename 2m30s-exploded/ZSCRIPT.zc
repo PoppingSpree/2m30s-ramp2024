@@ -661,7 +661,7 @@ class BMBeastBalloonBase : Actor
         {
             fuseLit = true;
             forceFireBurst = 35;
-            Console.PrintF("lit");
+            // Console.PrintF("lit");
             //A_Die();
             // health = 0;
         }
@@ -2050,7 +2050,7 @@ class BMFireyBoom : DoomImpBall
 		+Ripper;
 		RenderStyle "Normal";
 		Alpha 1;
-		SeeSound "BMSIBOOM";
+		SeeSound "";
 		DeathSound "";
 		+NOINTERACTION
 		
@@ -2060,7 +2060,7 @@ class BMFireyBoom : DoomImpBall
     states
     {
         Spawn:
-			BMBM B 1 NoDelay A_StartSound("BMSIBOOM");
+			BMBM B 1 NoDelay A_StartSound("BMSIBOOM", CHAN_5);
 			BMBM B 1 ;
 			BMBM C 1 A_Explode(15 * Max(Scale.X/2.0, 1), 128.0 * Max(Scale.X/2.0, 1), XF_NOTMISSILE | XF_CIRCULAR, false, 128.0 * Max(Scale.X/2.0, 1));
 			BMBM D 1 ;//A_RadiusThrust(30 * 100 * Max(Scale.X/2.0, 1), 128.0 * Max(Scale.X/2.0, 1), RTF_NOIMPACTDAMAGE | RTF_NOTMISSILE & RTF_AFFECTSOURCE, 128.0 * Max(Scale.X/2.0, 1), "None");
@@ -3152,22 +3152,28 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     }
 }
 
+// Despite the name, all of these are using projectiles for sake of time.
 class KissPanicMeleeEnemy : Demon
 {
 	Default
 	{
-		Tag "KissPanic Melee";
-		Radius 48;
+	    Tag "KissPanic Melee";
+	    Radius 48;
         Height 48;
-		Scale 0.25;
-		BloodType "BMPinkGlitter";
+	    Scale 0.25;
+	    BloodType "BMPinkGlitter";
+        
+        SeeSound "BMPBLAND";
+        DeathSound "BMNSPLAT";
+        ActiveSound "BMNKSTAP";
+        PainSound "BMNKPDUP";
 	}
 	
     states
     {
         Spawn:
 			BMSM A 25;
-			Loop;
+			Loop;        
 		Pain:
 			BMSM F 6;
 			BMSM F 12 A_Pain;
@@ -3188,6 +3194,35 @@ class KissPanicMeleeEnemy : Demon
     }
 }
 
+
+class KissPanicKiss : BaronBall
+{
+ Default
+ {
+   Radius 6;
+   Height 8;
+   Scale 2;
+   Speed 20;
+   FastSpeed 40;
+   Damage 3;
+   Projectile;
+   +RANDOMIZE
+   RenderStyle "Normal";
+   Alpha 1;
+   SeeSound "BMPBLAND";
+   DeathSound "BMPBLAND";
+ }
+ States
+ {
+ Spawn:
+   BMLP A 4 BRIGHT;
+   Loop;
+ Death:
+   BMLP A 6 BRIGHT;
+   Stop;
+ }
+}
+
 class KissPanicSam : KissPanicMeleeEnemy
 {
 	Default
@@ -3203,6 +3238,11 @@ class KissPanicSam : KissPanicMeleeEnemy
 		See:
 			BMSM D 2 Fast A_Chase;
 			Loop;
+	    Melee:
+	    Missile:
+		    BMSM D 8 A_FaceTarget;
+		    BMSM D 6 A_CustomComboAttack("BaronBall", 32, 3 * random(1, 8), "BMPBLAND");
+		    Goto See;
 		Pain:
 			BMSM I 6;
 			BMSM I 12 A_Pain;
@@ -3231,6 +3271,11 @@ class KissPanicFran : KissPanicMeleeEnemy
 		See:
 			BMSM B 2 A_Chase;
 			Loop;
+        Melee:
+	    Missile:
+		    BMSM B 8 A_FaceTarget;
+		    BMSM B 6 A_CustomComboAttack("BaronBall", 32, 3 * random(1, 8), "BMPBLAND");
+		    Goto See;
 		Pain:
 			BMSM G 6;
 			BMSM G 12 A_Pain;
@@ -3256,6 +3301,11 @@ class KissPanicCig : KissPanicMeleeEnemy
         Spawn:
 			BMSM A 25;
 			Loop;
+        Melee:
+	    Missile:
+		    BMSM A 8 A_FaceTarget;
+		    BMSM A 6 A_CustomComboAttack("KissPanicKiss", 32, 3 * random(1, 8), "BMPBLAND");
+		    Goto See;
 		See:
 			BMSM A 2 A_Chase;
 			Loop;
@@ -3287,6 +3337,11 @@ class KissPanicGo : KissPanicMeleeEnemy
 		See:
 			BMSM C 2 Fast A_Chase;
 			Loop;
+        Melee:
+	    Missile:
+		    BMSM C 8 A_FaceTarget;
+		    BMSM C 6 A_CustomComboAttack("KissPanicKiss", 32, 3 * random(1, 8), "BMPBLAND");
+		    Goto See;
 		Pain:
 			BMSM H 6;
 			BMSM H 12 A_Pain;
