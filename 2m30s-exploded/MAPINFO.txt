@@ -1,6 +1,7 @@
 Map MAP01 "2m30sDebug"
 {
-    music = "BMHALFIR"
+    //music = "BMHALFIR"
+    music = ""
 	intermusic = "SSYNACK"
     par = 60
     sky1 = "BMSKY2", 0.1
@@ -89,12 +90,14 @@ DoomEdNums
 	21591 = "BMNPCPercival2m30s"
 	21592 = "BMFakeTextureGlitch"
 	21593 = "BMTelevision"
+	21594 = "BMConversationDirector230"
 }
 
 // Remove these maps when submitting to RAMP2024
 Map MAPAFTER "2m 30s"
 {
-    music = "BMHALFIR"
+    //music = "BMHALFIR"
+    music = ""
     intermusic = "SSYNACK"
     par = 60
     sky1 = "BMSKY2", 0.1
