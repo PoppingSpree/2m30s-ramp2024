@@ -3081,11 +3081,14 @@ class BMEventsPlayAsALLCOMERS : EventHandler
         else if (e.Name == "BMActFinalGlitterFountain") 
 		{
 			console.Printf("BMActFinalGlitterFountain");
-        // Spawn a HUGE glitter fountain
-        //    if I had more time and felt clever, I'd loop through every remaining entity and do the fountains but I don't.
-         
-        let glitter = BMPinkGlitter(Actor.Spawn("BMPinkGlitter", Pos));
-        glitter.CountGenerations = 6; // This is probably going to be at least 500, possibly thousands...
+            // Spawn a HUGE glitter fountain
+            //    if I had more time and felt clever, I'd loop through every remaining entity and do the fountains but I don't.
+            let glitterThisGuy = players[net_arbitrator].mo;
+            if (glitterThisGuy) 
+            {
+                let glitter = BMPinkGlitter(Actor.Spawn("BMPinkGlitter", glitterThisGuy.Pos));
+                glitter.CountGenerations = 6; // This is probably going to be at least 500, possibly thousands...
+            }
 		}
 	}
 
@@ -3214,7 +3217,7 @@ class KissPanicKiss : BaronBall
  {
    Radius 6;
    Height 8;
-   Scale 2;
+   Scale 1;
    Speed 20;
    FastSpeed 40;
    Damage 3;
@@ -3254,7 +3257,7 @@ class KissPanicSam : KissPanicMeleeEnemy
 	    Melee:
 	    Missile:
 		    BMSM D 8 A_FaceTarget;
-		    BMSM D 6 A_CustomComboAttack("BaronBall", 32, 3 * random(1, 8), "BMPBLAND");
+		    BMSM D 6 A_CustomComboAttack("KissPanicKiss", 32, 3 * random(1, 8), "BMPBLAND");
 		    Goto See;
 		Pain:
 			BMSM I 6;
@@ -3287,7 +3290,7 @@ class KissPanicFran : KissPanicMeleeEnemy
         Melee:
 	    Missile:
 		    BMSM B 8 A_FaceTarget;
-		    BMSM B 6 A_CustomComboAttack("BaronBall", 32, 3 * random(1, 8), "BMPBLAND");
+		    BMSM B 6 A_CustomComboAttack("KissPanicKiss", 32, 3 * random(1, 8), "BMPBLAND");
 		    Goto See;
 		Pain:
 			BMSM G 6;
@@ -3975,7 +3978,12 @@ class BMTelevision : Actor
     States
     {
         Spawn:
+            BMTV A 1;
+            BMTV A 1 A_StartSound("BMKILLEM", CHAN_5, CHANF_LOOP);
             BMTV A -1;
+            Stop;
+        Death:
+            TNT1 A 0 A_SpawnProjectile("BMFireyBoom");
             Stop;
     }
 }
