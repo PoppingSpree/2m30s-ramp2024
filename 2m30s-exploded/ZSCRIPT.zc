@@ -3869,122 +3869,129 @@ class BMConv
 
         case BM_TOPIC_NATURE_OF_A_RAMP:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: If you had the power to make a world of your own and put anything you like in it, what would you make?");
+                lines.Push("Gasket: Nothing good, probably. Why this all of a sudden?");
+                lines.Push("Percival: I'm a terrible artist. I can barely draw a map and my penwork is unreadable!");
+                lines.Push("Gasket: Often, a 'terrible artist' is just one who hasn't been given the encouragement \nand time to explore and find their niche. \nIf I ask you 'if you could make anything, what would you make?' \nwhat is the first thing to come to mind? Don't think too hard about it.");
             break;
         case BM_TOPIC_JOY_CREATION:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: So...? If you could make anything at all, what would you make?");
+                lines.Push("Percival: I suppose I'd make a giant cup of tea to swim in! \nOr a big jello carrot planet that's super squishy and wiggly and juicy. \nBut... That sounds kinda silly-");
+                lines.Push("Gasket: And I'd make a world of plush toys and motorbikes. At least, that's what I always told my brother. \nPerhaps, if you somehow get another chance? Just try making things for yourself. Experiment. Have fun. And besides, is swimming not an art? You seem plenty good at that.");
+                lines.Push("Percival: I'll... think about it. Thank you.");
             break;
         case BM_TOPIC_FEAR_FAILURE:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: What if... what if I'm not good enough? What if people don't like what I make?");
+                lines.Push("Gasket: Hey, don't sweat it, Percy. Everyone starts somewhere. Just gotta keep tinkering and trying new things.");
+                lines.Push("Percival: But what if I never find my... my spark? My thing?");
+                lines.Push("Gasket: You will, hun. Just gotta keep those gears turning. Just try'nd enjoy yourself.");
             break;
         case BM_TOPIC_INSPIRATION:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: Where do you find your inspiration, G?");
+                lines.Push("Gasket: Anywhere. Everywhere, babe. The roar of an engine, the way light hits a chrome bumper, the thrill of a chase. \nEven an offhand joke with a stranger might ignite an idea.");
+                lines.Push("Percival: Sounds exciting! I guess I find mine in... quieter places. Squishy toys, sweet treats, gentle sounds, calm pastel colors.");
+                lines.Push("Gasket: To each their own, I guess. As long as it gets those creative juices flowing, right?");
+    
             break;
         case BM_TOPIC_VOICE:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: You know, you've got a unique style, Percy. Don't let anyone tell you different.");
+                lines.Push("Percival: You really think so? Sometimes I feel like my work is just... childish.");
+                lines.Push("Gasket: Childish? Nah, nothing about you is childish. \nYour aesthetic's got charm. It's got heart. That's something you can't fake.");
+                lines.Push("Percival: Thanks, G. That means a lot coming from you.");
+  
             break;
         case BM_TOPIC_INCIDENTAL:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: There was this one time where I was visiting the neighbors. And they had this huge, uh, decoration near the front door. \nI wasn't sure what it was, so I asked why they had such a massive thingy on display... and I tripped and fell on top of it.");
+                lines.Push("Gasket: Let me guess... \nit was a carrot sculpture?");
+                lines.Push("Percival: it was so embarrassing! But later that week, everyone started making... tributes? \nIt was so embarassing, but people found it endearing. They even made drawings of me! I swear \nI saved them on a disc somewhere, but I can't remember...");
+                lines.Push("Gasket: Sounds like you were quite the muse, Percy.");
             break;
         case BM_TOPIC_FRIENDSHIP:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: I'm glad we stuck together through all this, Gasket. I was cared when I first got here. \nAnd truthfully, I'm still scared. But having familiar faces to talk with helps a lot.");
+            lines.Push("Gasket: Yeah, dunno where I'd be now if I hadn't met you, Percy. You're not so bad for a fluffy bunny.");
+            lines.Push("Percival: And you're not so bad for a motorhead.");
+            lines.Push("Gasket: I'm as highly skilled a mercenary as I am a mechanic!"); 
             break;
+
         case BM_TOPIC_ART_BLOCK:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: I'm feeling a bit stuck lately. Like my ideas have dried up.");
+            lines.Push("Gasket: Creator's block, huh? Happens to the best of us. Try taking a break, doing something different for a while.");
+            lines.Push("Percival: Maybe I should just give up. I'm not sure I'm cut out for whatever this is we're doing here.");
+            lines.Push("Gasket: Don't say that, Percy. You've got talent. Just need to find that spark again.\nTake your time. Rest if you need to. And we'll figure out what next when we get there.");
             break;
+
         case BM_TOPIC_FEEDBACK:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: I like to hug everyone I meet. It's just so warm and pleasant. But sometimes people don't like that and I feel bad.");
+            lines.Push("Gasket: Look, you can't please everyone. It's good to focus on making yourself happy... \nBut maybe ask first when touching other people or their belongs.");
+            lines.Push("Percival: I don't want to make anyone uncomfortable. \nBut didn't you tell me to be myself and do things my way? To find my own style?");
+            lines.Push("Gasket: You can bake your cakes however you like, but when you cook for others, you ask their allergies before you give them a nasty surprise. \nYou might not get the chance to make ammends if you don't. \nWhen people ask for changes, don't let it get you down. Use it to learn and grow.");
             break;
+
         case BM_TOPIC_CELEBRATION:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: Whatever happened to all the music? It was all festive and trancy to celebrate all the new portals and visitors!");
+            lines.Push("Gasket: Which one? The C64 styled one with the low droning bass and the 'Dun da-da dun?' melody? Or the one with lots of layed pads?");
+            lines.Push("Percival: C64? Pads? What does that even mean?");
+            lines.Push("Gasket: Ah, sorry. Different ways of making music. (Sorta.) When the event was getting setup, the music was different.\nThen it got changed when they opened the gates for everyone to flood in. \nI guess whatever made the music play got lost after a few months. I wouldn't blame anyone if they took it for themselves.\n It's more fun than a TV that only plays one thing, anyway.");
             break;
+
         case BM_TOPIC_INTENT:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: Sometimes I think I have a great idea, but when I try to share it it doesn't go according to plan.");
+            lines.Push("Gasket: Yeah. Trying to estimate the meeting point of intent and execution is a skill on its own. \nAnd not a one-sided one. Even if you say what you intended, others might interpret it differently.");
+            lines.Push("Percival: That's so annoying! It'd be much better if we could just have it exactly how we want it.");
+            lines.Push("Gasket: Maybe. But sometimes the bumps on the ride are what make it memorable.");
             break;
+
         case BM_TOPIC_DOODLING:
-                lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+            lines.Clear();
+            lines.Push("Percival: Sometimes I just do things without thinking. It's like my body takes over.");
+            lines.Push("Gasket: That can be good for the soul, Percy. It's a way to let your mind wander and see what comes out.");
+            lines.Push("Percival: Maybe I should try that more often. It might help me get out of this creative funk.");
+            lines.Push("Gasket: Give it a shot. You might surprise yourself. And if you don't like what you get, you don't have to share it.\nI guess, unless you do it in public while peopl watch.");
             break;
         case BM_TOPIC_CONVERSATION:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: People are really big into bats lately. I don't think I'd fancy being a bat. \nWings are gross and I can't imagine using a wrench with 'em.");
+                lines.Push("Percival: I think you're make a beautiful bat if you wanted to be a bat!");
+                lines.Push("Gasket: Aw, that's sweet of you. Come to think, I'm reminded of really bouncy portal I wandered into once. Reminds me of you.");
+                lines.Push("Percival: You think I'm bouncy? Wait, how can a portal be bouncy?");
             break;
         case BM_TOPIC_SOCIAL:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
+                lines.Push("Gasket: I like a good thrill, but sometimes just kicking back and watching how things play out feels better.");
+                lines.Push("Percival: I like being able to talk with all kinds of people. \nWhere I came from, there weren't many people and they all kept secrets.");
+                lines.Push("Gasket: Do-ers, watchers, teachers, talkers. A strong community takes all sorts.");
                 lines.Push("Percival: ");
             break;
         case BM_TOPIC_1M_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
+                lines.Push("Percival: The sky's looking kinda pretty now. But I'm still scared. \nDo you think that it'll hurt...?");
+                lines.Push("Gasket: I doubt it. No body, no senses. No senses, no pain. \nBesides, if this is truely a nexus between 'hells', then this probably isn't the end. Just a new journey.");
+                lines.Push("Gasket: I wish I believed you, but I feel my stomache churning. \nLike, I've forgotten something important to me, and now I'm going to be forgotten too.");
                 lines.Push("Percival: ");
             break;
         case BM_TOPIC_30S_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: I've been waiting in this pool so long. I remember I made a promise to meet someone here. \nBut I just can't remember who. Or why. Or anything before the Green Rolling Hills back home. I guess time's up for this pool party...");
+                lines.Push("Gasket: I've been searching for my brother for so long. I don't remember how I ended up here. \nIt's a 'party', but maybe I'm here to pay for everyone I've hurt and mislead.");
+                lines.Push("Percival: But you're one of the kindest people I've met. I can't imagine you hurting anyone on purpose.");
+                lines.Push("Gasket: But I did. And I'm sure if this isn't the end, I will again. \nYou are a kind-natured soul and just need some time and experience. Not everyone is affectionate and trusting like you.");
             break;
         case BM_TOPIC_0S_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: Why can't I remember...?");
+                lines.Push("Gasket: I guess this is it, then...");
+                lines.Push("...");
+                lines.Push(" ");
             break;
         case BM_TOPIC_1M_SOLO_PERCI:
                 lines.Clear();
@@ -4074,8 +4081,8 @@ class BMConv
                 lines.Clear();
                 lines.Push("Gasket: Here's to the next adventure, whatever it may be.");
                 lines.Push("Percival: Eeeee, I'm getting excited! I'll miss home, but I've never been on a train before!");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: Next time we get a chance, I'm gonna take you on my bike. You'll love it, hun!");
+                lines.Push("Percival: Yeah! Yeah! That could be cool to try!");
             break;
         case BM_TOPIC_FOLLOWER_BONUS:
                 lines.Clear();
@@ -4095,10 +4102,11 @@ class BMConv
     int CountdownLengthFromStrLen(string str)
     {
         int ticks = 70 + lines[0].Length() * 5;
-        console.PrintF("Ticks For Talk: %i", ticks);
 
         // Time's up for me to work on this. AS a hack, we'll set all texts to be 5 seconds.
         ticks = 35 * 5;
+
+        console.PrintF("Ticks For Talk: %i", ticks);
         return ticks;
     }
 
