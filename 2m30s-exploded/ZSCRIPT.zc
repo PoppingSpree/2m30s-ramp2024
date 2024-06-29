@@ -3013,9 +3013,53 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     
 	override void OnRegister()
 	{
+        // This... seems to break when loading (such as dying) so...
 		console.printf("Event Handler registered. Will play as Al.");
 		showLevelWinSplash = false;
         bmg = BMGlobalVariables.Get();
+	}
+
+    override void WorldThingDied(WorldEvent e)
+	{
+		if (e.thing) // Check that the Actor is valid
+		{
+            let tTid = e.thing.GetThingID();
+            if (tTid >= 34100)
+            {
+                Console.PrintF("A WorldThing died that seems important. Spawning a reward.");
+                switch(tTid)
+                {
+                    case 34100:
+                    case 34101:
+                        let newThing = BMTicket2024(e.thing.Spawn("BMTicket2024"));
+                        newThing.SetOrigin(e.thing.Pos);
+                        break;
+                    case 34102:
+                        let newThing = BMDisc(e.thing.Spawn("BMDisc"));
+                        newThing.SetOrigin(e.thing.Pos);
+                        break;
+                    case 34103:
+                        let newThing = BMDangerNoodle(e.thing.Spawn("BMDangerNoodle"));
+                        newThing.SetOrigin(e.thing.Pos);
+                        break;
+                    case 34104:
+                        let newThing = BMDoomressNoArmor(e.thing.Spawn("BMDoomressNoArmor"));
+                        newThing.SetOrigin(e.thing.Pos);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (e.thing is "BMNPCGasket2m30s") 
+            {
+                let sparkles = BMPinkGlitter(e.thing.Spawn("BMPinkGlitter"));
+                sparkles.generations = 4;
+                sparkles.SetOrigin(e.thing.Pos);
+                
+            }
+
+        }
 	}
 	
 	override void WorldUnloaded(WorldEvent e)
@@ -3217,7 +3261,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
         // Flag that we want to draw and increase it every tick.
         pinkFadeOpacity = 0.0;
         
-        EventHandler.SendNetworkEvent("BMActFastFall");
+        EventHandler.SendNetworkEvent("BMActFadeToPink");
         
     }
 
@@ -3258,7 +3302,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             // Draw the backing texture.
             //dialogueBG = 
             TextureID test = TexMan.CheckForTexture("SBNEWSI");
-            Screen.DrawTexture(test, true, 32,32, DTA_Alpha, 0.666, DTA_FullScreenScale, FSMode_ScaleToFit);
+            Screen.DrawTexture(test, true, 0, 32, DTA_Alpha, 0.666, DTA_ScaleX, 20, DTA_FullScreenScale, FSMode_ScaleToFit);
 
             // Draw the text.
             //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
@@ -3267,12 +3311,13 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             fontLineOffset += fontHeight + 2;
 
             //This draws where I want, but no built in wordwrap...
-            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "Debug WOW THIS IS SOME TEXT", DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
+            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "Debug WOW THIS IS SOME TEXT\ntest/ntest\ntest/ntest\ntest/ntest\ntest/ntest", DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
 
 
             //statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (32,32 + fontLineOffset),
             //statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
             fontLineOffset += fontHeight + 2;
+            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "bmg.convoDirector.currentConvo.GetCurrentLine()", DTA_ScaleX, 4.0, DTA_ScaleY, 4.0);
             //statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
             // bmg.convoDirector.currentConvo.AdvanceLineCountdown(); DON'T DO THIS HERE, this runs on DRAW SPEED, which is much more variable than GameTicks.
 
@@ -3744,6 +3789,7 @@ class BMConv
     array<string> lines;
     int oneSec;
     bool currentConvoDone;
+    BMDialogueTopics currentTopic;
 
     string GetCurrentLine()
     {
@@ -3785,18 +3831,258 @@ class BMConv
         AdvanceLine();
 
     }
+
+    BMDialogueTopics PickRandomTopic()
+    {
+        let bmg = BMGlobalVariables.Get();
+        return bmg.SelectRandomTopic(); 
+    }
+
+    void PopulateConvoByRandom()
+    {
+        currentTopic = PickRandomTopic();
+        PopulateConvoByTopic(currentTopic)
+    }
     
     void PopulateConvoByTopic(BMDialogueTopics topic)
     {
-    
+        currentTopic = topic;
         switch (topic)
         {
             case BM_TOPIC_INTRO:
                 lines.Clear();
-                lines.Push("Percival: I think I hear something. Someone new, I mean.");
-                lines.Push("Gasket: Huh? Really? Can't remember the last time there's been another person here. Not that it matters much. Not much time left.");
+                // lines.Push("Percival: I think I hear something. Someone new, I mean.");
+                // lines.Push("Gasket: Huh? Really? Can't remember the last time there's been another person here. Not that it matters much. Not much time left.");
+                lines.Push("Percival: This place... Feels like it's dying.");
+                lines.Push("Gasket: Everything ends eventually. Even the wildest party.\nBut something tells me this place isn't as dead as it seems.");
+                lines.Push("Percival: Huh? Oh! I think I hear something. Someone new, I mean.");
+                lines.Push("Gasket: I guess they're here for the going-away party.");
             break;
 
+            case BM_TOPIC_RECURRING:
+                lines.Clear();
+                lines.Push("Gasket: I'm getting the strangestest feeling that we've done this before.");
+                lines.Push("Percival: We've been here for a while. Of course we mention the same topics sometimes.");
+                lines.Push("Gasket: Not like that, hun. \nIt's as if timelines are jumping left and right, starting and stopping... );
+                lines.Push("Percival: Like it's all been reset?");
+            break;
+
+        case BM_TOPIC_NATURE_OF_A_RAMP:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_JOY_CREATION:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_FEAR_FAILURE:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_INSPIRATION:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_VOICE:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_INCIDENTAL:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_FRIENDSHIP:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_ART_BLOCK:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_FEEDBACK:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_CELEBRATION:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_INTENT:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_DOODLING:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_CONVERSATION:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_SOCIAL:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_1M_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_30S_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_0S_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_1M_SOLO_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_30S_SOLO_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_0S_SOLO_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_1M_SOLO_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_30S_SOLO_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_0S_SOLO_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_1M_CONVINCE_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_30S_CONVINCE_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_0S_CONVINCE_PERCI:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_1M_CONVINCE_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_30S_CONVINCE_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_0S_CONVINCE_PERCI_GASKET:
+                lines.Clear();
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_ENDINGS_ARE_BEGINNINGS:
+                lines.Clear();
+                lines.Push("Gasket: Here's to the next adventure, whatever it may be.");
+                lines.Push("Percival: Eeeee, I'm getting excited! I'll miss home, but I've never been on a train before!");
+                lines.Push("Gasket: ");
+                lines.Push("Percival: ");
+            break;
+        case BM_TOPIC_FOLLOWER_BONUS:
+                lines.Clear();
+                lines.Push("Goodbye RAMP!\nAnd...\nHello RAMP!");
+                lines.Push("You may now summon Percival at any time via console with:\nsummon BMPercivalFollower\n(You always could. This was supposed to be an unlockable but I ran out of time lol.)");
+                lines.Push("Wishing you all the best and hope you're having a good time!\nStay strong, explore, experiment, create, and get messy! It's more fun that way (usually)!");
+            break;
             default:
                 lines.Clear();
                 lines.Push("AAAAAA YOU BROKE THE CUTSCENE TEXT DIALOGUE SYSTEM THINGY THIS CLSOE OT THEEND OF RAMP WHAT DID YOU DO"); 
@@ -3810,6 +4096,9 @@ class BMConv
     {
         int ticks = 70 + lines[0].Length() * 5;
         console.PrintF("Ticks For Talk: %i", ticks);
+
+        // Time's up for me to work on this. AS a hack, we'll set all texts to be 5 seconds.
+        ticks = 35 * 5;
         return ticks;
     }
 
