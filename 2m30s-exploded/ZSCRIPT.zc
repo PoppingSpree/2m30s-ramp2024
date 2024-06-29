@@ -3974,14 +3974,14 @@ class BMConv
             break;
         case BM_TOPIC_1M_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Percival: The sky's looking kinda pretty now. But I'm still scared. \nDo you think that it'll hurt...?");
-                lines.Push("Gasket: I doubt it. No body, no senses. No senses, no pain. \nBesides, if this is truely a nexus between 'hells', then this probably isn't the end. Just a new journey.");
-                lines.Push("Gasket: I wish I believed you, but I feel my stomache churning. \nLike, I've forgotten something important to me, and now I'm going to be forgotten too.");
-                lines.Push("Percival: ");
-            break;
+                lines.Push("Percival: G-Gasket? The sky is turning pink... I'm scared!");
+                lines.Push("Gasket: Easy, Percy. It's just the sky doing its thing. We've seen weirder, right?");
+                lines.Push("Percival: But... but it feels different this time. Like it's really ending.");
+                lines.Push("Gasket: Maybe it is. But endings always lead to new beginnings, right?");
+                break;
         case BM_TOPIC_30S_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Percival: I've been waiting in this pool so long. I remember I made a promise to meet someone here. \nBut I just can't remember who. Or why. Or anything before the Green Rolling Hills back home. I guess time's up for this pool party...");
+                lines.Push("Percival: I've been waiting in this pool so long. I remember I made a promise to meet someone here. \nBut I just can't remember who. Or why. Or anything before the Green Rolling Hills back home. I guess time's up for this pool party...\nI don't want to disappear...");
                 lines.Push("Gasket: I've been searching for my brother for so long. I don't remember how I ended up here. \nIt's a 'party', but maybe I'm here to pay for everyone I've hurt and mislead.");
                 lines.Push("Percival: But you're one of the kindest people I've met. I can't imagine you hurting anyone on purpose.");
                 lines.Push("Gasket: But I did. And I'm sure if this isn't the end, I will again. \nYou are a kind-natured soul and just need some time and experience. Not everyone is affectionate and trusting like you.");
@@ -3995,45 +3995,46 @@ class BMConv
             break;
         case BM_TOPIC_1M_SOLO_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: Gasket? ... I'm so scared...");
+                lines.Push("Percival: The world is ending, and I'm all alone...");
+                lines.Push("Percival: I don't want to be forgotten...");
+                lines.Push("Percival: Please, someone... help me...");
+                break;
             break;
         case BM_TOPIC_30S_SOLO_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: It's so cold... so dark...");
+            lines.Push("...");
+            lines.Push("Percival: I don't want to disappear...");
+            lines.Push("Percival: Someone... anyone... please...");
             break;
         case BM_TOPIC_0S_SOLO_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: NO! I don't want to go!");
+                lines.Push("Percival: help me");
+                lines.Push("...");
+                lines.Push(" ");
             break;
         case BM_TOPIC_1M_SOLO_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: One minute left? Guess this is it. Well, at least I'm going out with a bang.");
+                lines.Push("Gasket: Maybe I should've been nicer to that bunny. She was quirky, but she wasn't so bad, after all.");
+                lines.Push("...");
+                lines.Push("Gasket: Who are you, anyway? Why would you come back to...this?");
             break;
         case BM_TOPIC_30S_SOLO_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: Wish I could see my brother one last time. \nTell him I'm sorry for all the trouble I caused.");
+                lines.Push("Gasket: Wish I could see my brother one last time. \nTell him I'm sorry for all the trouble I caused.");
+                lines.Push("...");
+                lines.Push("Gasket:  Hey, world! You ain't seen the last of Gasket!");
             break;
         case BM_TOPIC_0S_SOLO_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Gasket: Huh. Pretty. I guess this is it, then.");
+                lines.Push("Gasket: Sorry, Bro. If there's something after this, maybe I'll find you there.");
+                lines.Push("...");
+                lines.Push(" ");
             break;
         case BM_TOPIC_1M_CONVINCE_PERCI:
                 lines.Clear();
