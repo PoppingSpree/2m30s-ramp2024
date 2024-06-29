@@ -51,6 +51,12 @@ DoomEdNums
 	21524 = "BMSpawnerTankPinky"
 	21525 = "BMSpawnerTankBMCacoSqueaken"
 	
+	21526 = "BMTicket2024"
+	21527 = "BMDoomressNoArmor"
+	21528 = "BMDisc"
+	21529 = "BMDangerNoodle"
+	21530 = "BMDeadlyDangerNoodle"
+	
 	21550 = "BMCacoSqueaken"
 	21551 = "BMCacoBouncer"
 	21552 = "BMBeeStinger"

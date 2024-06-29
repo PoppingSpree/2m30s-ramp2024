@@ -160,11 +160,94 @@ class BMCheckpoint : CustomInventory
 
     action void TimeExtend(int seconds)
     {
-        Console.PrintF("TODO: Checkpoint");
+        //Console.PrintF("TODO: Checkpoint");
     }
 }
 
-class BMDoomkini : GreenArmor
+class BMTicket2024 : Inventory
+{
+	Default
+	{
+        Inventory.Amount 1;
+        Inventory.MaxAmount 2;
+		Inventory.pickupsound "misc/p_pkup";
+		Inventory.pickupmessage "One (1) ticket to the Underground.";
+		Radius 64;
+		Height 64;
+	}
+	
+    states
+    {
+        Spawn:
+            ATKT A -1 bright;
+            stop;
+		Pickup:
+            stop;
+    }
+}
+class BMDoomressNoArmor : Inventory
+{
+    Default
+	{
+        Inventory.Amount 1;
+        Inventory.MaxAmount 1;
+        inventory.pickupsound "misc/p_pkup";
+        inventory.pickupmessage "A lovely dress! Seems familiar.";
+        inventory.respawntics 2010;
+        Radius 64;
+		Height 64;
+        +COUNTITEM;
+    }
+    states
+    {	
+        Spawn:
+            GBKN B -1 bright;
+            stop;
+    }
+}
+class BMDisc : Inventory
+{
+    Default
+	{
+        Inventory.Amount 1;
+        Inventory.MaxAmount 1;
+        inventory.pickupsound "misc/p_pkup";
+        inventory.pickupmessage "Some kind of disc? There are snakes printed on the surface.";
+        inventory.respawntics 2010;
+        Radius 64;
+		Height 64;
+        +COUNTITEM;
+    }
+    states
+    {	
+        Spawn:
+            BMWP Z -1 bright;
+            stop;
+    }
+}
+
+class BMDangerNoodle : Inventory
+{
+    Default
+	{
+        Inventory.Amount 1;
+        Inventory.MaxAmount 1;
+        inventory.pickupsound "misc/p_pkup";
+        inventory.pickupmessage "A statue of a Danger Noodle.";
+        inventory.respawntics 2010;
+        Radius 64;
+		Height 64;
+        +COUNTITEM;
+    }
+    states
+    {	
+        Spawn:
+            GRHB S -1 bright;
+            stop;
+    }
+}
+
+class BMDoomkini : Inventory
 {
     Default
 	{
@@ -2139,7 +2222,7 @@ class BMDeadlyToilet : Actor
 		Tag "Deadly Toilet";
 		Radius 32;
         Height 32;
-
+        Scale 1;
 		Health 10;
 		Speed 0;
 		+SOLID;
@@ -2158,6 +2241,36 @@ class BMDeadlyToilet : Actor
 		Death:
 			BMTL B random(16, 35);
 			BMTL C 35 A_SpawnProjectile("BMFireyBoom");
+			Stop;
+    }
+}
+
+class BMDeadlyDangerNoodle : BMDeadlyToilet
+{
+	Default
+	{
+		Tag "Deadly Danger Noodle";
+		Radius 32;
+        Height 32;
+        Scale 1;
+		Health 10;
+		Speed 0;
+		+SOLID;
+		+SHOOTABLE;
+		+NOBLOOD;
+		+ACTIVATEMCROSS;
+		+DONTGIB;
+		+NOICEDEATH;
+	}
+	
+    states
+    {
+        Spawn:
+			GRHB S -1;
+			Loop;
+		Death:
+			GRHB S random(16, 35);
+			GRHB S 35 A_SpawnProjectile("BMFireyBoom");
 			Stop;
     }
 }
@@ -3758,7 +3871,7 @@ enum BMDialogueTopics
     	Default
     	{
     		DropItem "BMBSting";
-    		Health 500;
+    		Health 50;
     		PainChance 200;
     		Radius 16;
     		Height 56;
@@ -3778,6 +3891,7 @@ enum BMDialogueTopics
     		+FRIENDLY;
     		+USESPECIAL;
     		-BUMPSPECIAL;
+            BloodType "BMPinkGlitter";
     		MinMissileChance 150;
     		MaxStepHeight 16;
     		MaxDropoffHeight 32;
@@ -3825,6 +3939,7 @@ enum BMDialogueTopics
     		+FRIENDLY;
     		+USESPECIAL;
     		-BUMPSPECIAL;
+            BloodType "BMPinkGlitter";
     		MinMissileChance 150;
     		MaxStepHeight 16;
     		MaxDropoffHeight 32;
@@ -3972,9 +4087,10 @@ class BMTelevision : Actor
     Default
     {
         Tag "Deadly Television";
-		DropItem "BMHealthPatch";
 		Health 20;
-        Scale 0.25;
+        Scale 1;
+        Radius 64;
+        Height 64;
 		Speed 0;
 		+SOLID;
 		+SHOOTABLE;
