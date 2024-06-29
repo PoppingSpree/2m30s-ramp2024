@@ -4038,45 +4038,41 @@ class BMConv
             break;
         case BM_TOPIC_1M_CONVINCE_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: I forgot about this dress! Where did you find it? I thought I lost it forever...");
+                lines.Push("Gasket: Someone's been holding onto your old things, Percy. Maybe they're trying to tell you something?");
+                lines.Push("Percival: But why would they bring it here? They found it. They could do anything with it. But they brought it back to RAMP?");
+                lines.Push("Gasket: A memo of the good times. Or, maybe they want you to move on.");
             break;
         case BM_TOPIC_30S_CONVINCE_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: My disc! I know I was supposed to guard it like a key, but it had all of my favorite art and music on it!");
+                lines.Push("Gasket: It's got your favorite music? Shame we don't have time for me to hear it.");
+                lines.Push("Percival: If this stranger found my disc and found a way here, maybe they can find a way out so we can play it back?");
+                lines.Push("Gasket: Nah. I'm good. I'm tired. I'll... catch up with you later.");
             break;
         case BM_TOPIC_0S_CONVINCE_PERCI:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: I see the train! Thank you for reminding me of what's important. I won't forget this!");
+                lines.Push("Gasket: Have a blast out there, Percy!");
+                lines.Push("...");
+                lines.Push("Gasket: Why are you still here? Well... that was anticlimactic.");
             break;
         case BM_TOPIC_1M_CONVINCE_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: You found all my things! Does this mean...? Can we leave this place?");
+                lines.Push("Gasket: Hey, easy there, hotshot! What's with all the firepower?");
+                lines.Push("Percival: Maybe they're just excited. They want us to come with them!");
+                lines.Push("Gasket: Alright, alright. If you're so eager to leave, I'm not gonna stop you. Let's see what this train's all about.");
             break;
         case BM_TOPIC_30S_CONVINCE_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
+                lines.Push("Percival: Get to the train! We're coming! We're coming!");
+                lines.Push("Percival: Get to the train! We're coming! We're coming!");
+                lines.Push("Gasket: Hold on tight, Percy. This is gonna be a hell of a ride!");
+                lines.Push("Gasket: Hold on tight, Percy. This is gonna be a hell of a ride!");
             break;
         case BM_TOPIC_0S_CONVINCE_PERCI_GASKET:
                 lines.Clear();
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
-                lines.Push("Gasket: ");
-                lines.Push("Percival: ");
             break;
         case BM_TOPIC_ENDINGS_ARE_BEGINNINGS:
                 lines.Clear();
