@@ -100,7 +100,7 @@ DoomEdNums
 }
 
 // Remove these maps when submitting to RAMP2024
-Map MAPAFTER "2m 30s"
+Map MAPAFTER "2m 30s x2: Out of Time"
 {
     //music = "BMHALFIR"
     music = ""

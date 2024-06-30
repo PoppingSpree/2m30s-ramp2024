@@ -2738,6 +2738,8 @@ class BMFollowerPercivalEvents : EventHandler
      }
 }
 
+// Consider redoing this to instead be a powerup subclass instead of a playerpawn.
+// That would both be more modular, and more flexible for other modders to toy with out of context.
 class BMPlayerALLCOMERS : DoomPlayer
 {
 	double crouchDashSpeed;
@@ -2996,9 +2998,12 @@ class BMPlayerALLCOMERS : DoomPlayer
 class BMEventsPlayAsALLCOMERS : EventHandler
 {
     bool showLevelWinSplash;
+    
+    bool showBlackFade;
     bool showPinkFade;
     double pinkFadeOpacity;
     int postFade;
+
     PlayerInfo spawnedPlayerInfo;
     PlayerPawn originalPlayerPawn;
     Name originalPlayerClass;
@@ -3006,6 +3011,15 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     double originalPlayerJumpZ;
     BMPlayerALLCOMERS allcomers;
     bool alPrepared;
+    int totalTicks;
+
+    bool percivalDown;
+    bool gasketDown;
+
+    bool ammoCheck;
+    bool itemCheck;
+
+    int thingDieCount;
 
     TextureID dialogueBG;
 
@@ -3021,6 +3035,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 
     override void WorldThingDied(WorldEvent e)
 	{
+        thingDieCount++;
 		if (e.thing) // Check that the Actor is valid
 		{
             let tTid = e.thing.TID;
@@ -3033,6 +3048,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
                     case 34100:
                     case 34101:
                         newThing = Actor(e.thing.Spawn("BMTicket2024"));
+                        let raisedPos =  (e.thing.Pos.X, e.thing.Pos.Y, e.thing.Pos.Z + 64);
                         newThing.SetOrigin(e.thing.Pos, false);
                         break;
                     case 34102:
@@ -3054,24 +3070,111 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 
             if (e.thing is "BMNPCGasket2m30s") 
             {
+                gasketDown = true;
                 let sparkles = BMPinkGlitter(e.thing.Spawn("BMPinkGlitter"));
-                sparkles.CountGenerations = 4;
+                sparkles.CountGenerations = 5;
                 sparkles.SetOrigin(e.thing.Pos, false);
+                //Interrupt the dialogue.
+                // If Percival is alive
+                if (!percivalDown){bmg.convoDirector.currentConvo.InterruptLine("Percival: EEP! What are you doing!? Why did you do that!?");}
+                else {EarlyEnd();}
                 
+                // Otherwise, accelerate the end.
+                // 
+                
+                //Switch to the solo topics.
+                
+            }
+            if (e.thing is "BMNPCPercival2m30s") 
+            {
+                percivalDown = true;
+                let sparkles = BMPinkGlitter(e.thing.Spawn("BMPinkGlitter"));
+                sparkles.CountGenerations = 5;
+                sparkles.SetOrigin(e.thing.Pos, false);
+                //Intterupt the dialogue.
+                //Switch to the solo topics.
+
+                // If Gasket is still alive.
+                if (!gasketDown){bmg.convoDirector.currentConvo.InterruptLine("Gasket: What the hell did she ever do to you? She was just trying to be friendly!");}
+                else {EarlyEnd();}
+
+                // Otherwise, accelerate the end.
+                // bmg.convoDirector.currentConvo.InterruptLine("");
             }
 
         }
 	}
+
+    void EarlyEnd()
+    {
+        Console.PrintF("That's all, folks. On to the next!");
+        bmg.convoDirector.currentConvo.InterruptLine("");
+        bmg.convoDirector.show = false;
+
+        let sparkles = BMPinkGlitter(spawnedPlayerInfo.mo.Spawn("BMPinkGlitter"));
+        sparkles.CountGenerations = 6;
+        sparkles.SetOrigin(spawnedPlayerInfo.mo.Pos, false);
+
+        StartFadeToPink();
+    }
+
+    override void WorldLineActivated (WorldEvent e) 
+    {
+        if (e.ActivatedLine.Index() == 1222) 
+        {
+            Console.PrintF("End the level: Train.");
+            StartFadeToBlack();
+        }
+    }
 	
+    // This works when leaving the world, not when loading a save.
+	override void WorldLoaded(WorldEvent e)
+	{
+	    console.printf("World Loaded.");
+	}
+
+    // This works when leaving the world, not when loading a save.
 	override void WorldUnloaded(WorldEvent e)
 	{
-	    console.printf("HOLLOWROUND Event Handler UnRegistered. Reset all player values to what they were at map start.");
+	    console.printf("World Unloaded. Reset all player values to what they were at map start.");
 	    ResetPlayerToPriorState();
+	}
+
+    override void PlayerEntered(PlayerEvent e)
+	{
+        Console.PrintF("Player Entered.");
+	}
+
+    override void PlayerRespawned(PlayerEvent e)
+	{
+        Console.PrintF("Player Respawned.");
+	}
+
+    override void NewGame()
+	{
+        Console.PrintF("New Game");
 	}
 
 	override void PlayerSpawned(PlayerEvent e)
 	{
-		// Spawn a corresponding new Al player for this spawned player.
+        Console.PrintF("Player Spawned.");
+		AttachAllcomersForPlayer(e.PlayerNumber);
+	}
+
+    void GiveAllCrayonWeapons(Actor playerPawn)
+    {
+        playerPawn.ClearInventory();
+        playerPawn.GiveInventory("BMPatcher", 10);
+        playerPawn.GiveInventory("BMDigouter", 10);
+        playerPawn.GiveInventory("BMBSting", 10);
+        playerPawn.GiveInventory("BMSerpentine", 10);
+        playerPawn.GiveInventory("BMFallstreak", 10);
+        playerPawn.GiveInventory("BMSuperShieldBurst", 10);
+    }
+
+    void AttachAllcomersForPlayer(int playerNum)
+    {
+        // Spawn a corresponding new Al player for this spawned player.
 		// As a reminder, the playerpawn's (or monster's) .player should point
 		// to the corresponding PlayerInfo, and the PlayerInfo's .mo should 
 		// be pointing to the corresponding PlayerPawnActor/Monster.
@@ -3092,11 +3195,13 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		// Bug that will hopefully just not happen often:
 		// If the player change-maps across maps wwhere this code is used,
 		// their "original" settings will now be copies of the modified settings.
-		spawnedPlayerInfo = players[e.PlayerNumber];
+		spawnedPlayerInfo = players[playerNum];
 		originalPlayerPawn = spawnedPlayerInfo.mo;
 		originalPlayerClass = originalPlayerPawn.GetClassName();
 		originalPlayerSoundClass = originalPlayerPawn.SoundClass;
         originalPlayerJumpZ = originalPlayerPawn.jumpZ;
+
+        GiveAllCrayonWeapons(originalPlayerPawn);
 
 		if (allcomers)
 		{
@@ -3110,9 +3215,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		console.PrintF("Allcomers counter: (%i)", allcomers.strangeCounter);
 		
 		// This seems to mostly work. Not sure what to do about player death since this doesn't cause the usual death reaction?
-		
-		
-	}
+    }
 
     // Gotta make sure I at least TRY to make it unlikely to unintentionally leave this map with modified properties
     // Or David will probably be annoyed.
@@ -3266,21 +3369,160 @@ class BMEventsPlayAsALLCOMERS : EventHandler
         // Flag that we want to draw and increase it every tick.
         pinkFadeOpacity = 0.0;
         
-        EventHandler.SendNetworkEvent("BMActFadeToPink");
+        EventHandler.SendNetworkEvent("BMActFinalGlitterFountain");
         
     }
 
-    void DrawFadeToPink()
+    void TickPinkFade()
     {
         // Reset opacity to 0;
-        showPinkFade = true;
-        if (pinkFadeOpacity <= 1) {pinkFadeOpacity += 0.02; postFade = 0;}
+        if (pinkFadeOpacity < 1) {pinkFadeOpacity += 0.0025; postFade = 0;}
         else {pinkFadeOpacity = 1; postFade++;}
 
         if (postFade == 70) {Exit_Normal(0);}
+    }
+    
+    void StartFadeToBlack()
+    {
+        // Spawn a HUGE glitter fountain
+        // Reset opacity to 0;
+        showBlackFade = true;
+        // Flag that we want to draw and increase it every tick.
+        pinkFadeOpacity = 0.0;        
+    }
 
-        let texID = TexMan.CheckForTexture("BMPINK01");
-        Screen.DrawTexture(texID, true, 0, 0, DTA_Fullscreen, true, DTA_FullScreenScale, FSMode_ScaleToFill);
+    void TickBlackFade()
+    {
+        // Reset opacity to 0;
+        if (pinkFadeOpacity < 1) {pinkFadeOpacity += 0.005; postFade = 0;}
+        else {pinkFadeOpacity = 1; postFade++;}
+
+        if (postFade == 70) {Exit_Normal(0);}
+    }
+
+    override void WorldTick()
+    {
+        totalTicks++;
+    
+        // Trying to prevent the unwinnable state from losing abilities on savefile load.
+        if (totalTicks > 10 && totalTicks < 20 && !allComers) {AttachAllcomersForPlayer(net_arbitrator);}
+
+        if (showPinkFade) 
+        {
+            TickPinkFade();
+        }
+        if (showBlackFade) 
+        {
+            TickBlackFade();
+        }
+
+        let ticksRemaining = 35 * (150) * 2; //2m30sx2
+        ticksRemaining -= totalTicks;
+        if (ticksRemaining == 0) // 0 time remaining.
+        {
+            
+        }
+        else if (ticksRemaining == 35 * 60 * 2) //1 min base, 2 min extended.  
+        {
+            let pp = spawnedPlayerInfo.mo;
+            Console.PrintF("BMTicket2024: (%i), BMTicket2024x2: (%i), BMDoomressNoArmor: (%i), BMDisc: (%i), BMDangerNoodle: (%i)", 
+            pp.CheckInventory("BMTicket2024", 1), pp.CheckInventory("BMTicket2024", 2), pp.CheckInventory("BMDoomressNoArmor", 1), pp.CheckInventory("BMDisc", 1), pp.CheckInventory("BMDangerNoodle", 1));
+
+            Console.PrintF("Things Died: (%i)", thingDieCount);
+            
+            // The whole "waste ammo to spook the characters" gimmick will take more time than I have left.
+            // This unexplained hack will have to do.
+            ammoCheck = thingDieCount > 24 && pp.CheckInventory("BMTicket2024", 2); 
+            itemCheck = pp.CheckInventory("BMTicket2024", 1);
+            itemCheck = itemCheck && pp.CheckInventory("BMDoomressNoArmor", 1);
+            itemCheck = itemCheck && pp.CheckInventory("BMDisc", 1);
+            itemCheck = itemCheck && pp.CheckInventory("BMDangerNoodle", 1);
+            
+            if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) 
+            {
+                bmg.convoDirector.show = true;
+                if (percivalDown && gasketDown) 
+                {
+                    // The level is setup to auto-end shortly in this case and shouldn't require a special case.
+                    bmg.convoDirector.show = false;
+                    //bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);
+                }
+                else if (percivalDown && !gasketDown) 
+                {
+                    bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_SOLO_GASKET);
+                }
+                else if (!percivalDown && gasketDown) 
+                {
+                    bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_SOLO_PERCI);
+                }
+                else if (!percivalDown && !gasketDown) 
+                {
+                    bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_PERCI_GASKET);
+                }
+                else if (!percivalDown && !gasketDown && itemCheck) 
+                {
+                    bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_CONVINCE_PERCI);
+                }
+                else if (!percivalDown && !gasketDown && itemCheck && ammoCheck) 
+                {
+                    bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_CONVINCE_PERCI_GASKET);
+                }
+            }
+        }
+        else if (ticksRemaining == 35 * 30 * 2)  //30 sec base, 1 min extended.
+        {
+
+        }
+
+/*
+Why is the ZScript version of CheckItem not covered on any of the wikis?
+bool CheckInventory(class<Inventory> itemtype, int itemamount, int owner = AAPTR_DEFAULT)
+	{
+		if (itemtype == null)
+		{
+			return false;
+		}
+		let owner = GetPointer(owner);
+		if (owner == null)
+		{
+			return false;
+		}
+
+		let item = owner.FindInventory(itemtype);
+
+		if (item)
+		{
+			if (itemamount > 0)
+			{
+				if (item.Amount >= itemamount)
+				{
+					return true;
+				}
+			}
+			else if (item.Amount >= item.MaxAmount)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+*/
+    }
+    
+    ui void DrawFadeToPink()
+    {
+
+        let texID = TexMan.CheckForTexture("BMPINK02");
+        Screen.DrawTexture(texID, true, 0, 0, DTA_Fullscreen, true, DTA_FullScreenScale, FSMode_ScaleToFill, DTA_Alpha, pinkFadeOpacity);
+        // Probably increase some kind of post-full-fade counter before we end level?
+        // Flag that we want to draw and increase it every tick.
+    }
+
+    ui void DrawFadeToBlack()
+    {
+
+        let texID = TexMan.CheckForTexture("BMPINK02");
+        Screen.DrawTexture(texID, true, 0, 0, DTA_Fullscreen, true, DTA_FullScreenScale, FSMode_ScaleToFill, DTA_Alpha, pinkFadeOpacity, DTA_Color, 0xFF000000);
         // Probably increase some kind of post-full-fade counter before we end level?
         // Flag that we want to draw and increase it every tick.
     }
@@ -3297,17 +3539,22 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             DrawCustomLevelTallyOverlay();
 		}
         
-        // if (bmg) {Console.PrintF("bmg is NOT null.");}
-        // if (bmg && bmg.convoDirector) {Console.PrintF("convoDirector is NOT null.");}
-        // if (bmg && bmg.convoDirector && bmg.convoDirector.show ) {Console.PrintF("convoDirector SHOW is SET");}
-        // if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) {Console.PrintF("All Convo Checks Passed.");}
+        if (showPinkFade) 
+        {
+            DrawFadeToPink();
+        }
+        if (showBlackFade) 
+        {
+            DrawFadeToBlack();
+        }
+
 
         if (bmg && bmg.convoDirector && bmg.convoDirector.show && bmg.convoDirector.currentConvo) 
         {
             // Draw the backing texture.
             //dialogueBG = 
             TextureID test = TexMan.CheckForTexture("SBNEWSI");
-            Screen.DrawTexture(test, true, 0, 64, DTA_Alpha, 0.666, DTA_ScaleX, 20, DTA_FullScreenScale, FSMode_ScaleToFit);
+            Screen.DrawTexture(test, true, 0, 64, DTA_Alpha, 0.666, DTA_ScaleX, 20, DTA_Color, 0x99000000);
 
             // Draw the text.
             //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
@@ -3688,6 +3935,8 @@ class BMGlobalVariables : Thinker
         int indexSelected = Random(0, topicsAvailable.Size() - 1);
         
         selected = topicsAvailable[indexSelected];
+        topicsAvailable.Delete(indexSelected); // I really hope this auto-shits the remaining items.
+        // If it doesn't I'll just comment out the delete so it doesn't break.
         
         return selected;
     }
@@ -3825,12 +4074,16 @@ class BMConv : Thinker
         }
         else
         {
-            Console.PrintF("Convo is done, you should probably handle that on next countdown end or something idk");
+            // Console.PrintF("Convo is done, you should probably handle that on next countdown end or something idk");
             countdownLineDisplay = 9999*9999;
             lineIndex = 0;
             currentConvoDone = true;
 
             if (currentTopic == BM_TOPIC_POST_END_EMPTY_FILLER) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else if (currentTopic == BM_TOPIC_1M_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_30S_PERCI_GASKET);}
+            else if (currentTopic == BM_TOPIC_30S_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_0S_PERCI_GASKET);}
+            else if (currentTopic == BM_TOPIC_0S_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
 
             else if (currentTopic == BM_TOPIC_1M_SOLO_PERCI) {PopulateConvoByTopic(BM_TOPIC_30S_SOLO_PERCI);}
             else if (currentTopic == BM_TOPIC_30S_SOLO_PERCI) {PopulateConvoByTopic(BM_TOPIC_0S_SOLO_PERCI);}
@@ -3855,9 +4108,9 @@ class BMConv : Thinker
     // Maybe have a version that takes multiple lines? I don't have time now.
     void InterruptLine(string interruption)
     {
+        PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);
         lines.Insert(lineIndex+1, interruption);
         AdvanceLine();
-
     }
 
     BMDialogueTopics PickRandomTopic()
@@ -3936,7 +4189,7 @@ class BMConv : Thinker
                 lines.Clear();
                 lines.Push("Percival: There was this one time where I was visiting the neighbors. And they had this huge, uh, decoration near the front door. \nI wasn't sure what it was, so I asked why they had such a massive thingy on display... and I tripped and fell on top of it.");
                 lines.Push("Gasket: Let me guess... \nit was a carrot sculpture?");
-                lines.Push("Percival: !!! It was so embarrassing! But later that week, everyone started making... tributes? \nIt was so embarassing, but people found it endearing. They even made drawings of me! I swear \nI saved them on a disc somewhere, but I can't remember...");
+                lines.Push("Percival: !!! It was so embarassing! But later that week, everyone started making... tributes? \nThey even made drawings of me! I swear \nI saved them on a disc somewhere, but I can't remember...");
                 lines.Push("Gasket: Sounds like you were quite the muse, Percy.");
             break;
         case BM_TOPIC_FRIENDSHIP:
@@ -3966,9 +4219,9 @@ class BMConv : Thinker
         case BM_TOPIC_CELEBRATION:
             lines.Clear();
             lines.Push("Percival: Whatever happened to all the music? \nIt was all festive and trancy to celebrate all the new portals and visitors!");
-            lines.Push("Gasket: Which one? The C64 styled one with the \nlow droning bass and the 'Dun da-da dun?' melody? \nOr the one with lots of layed pads?");
-            lines.Push("Percival: C64? Pads? What does that even mean?");
-            lines.Push("Gasket: Ah, sorry. Different ways of making music. (Sorta.) \nWhen the event was getting setup, the music was different.\nThen it got changed when they opened the gates for everyone to flood in. \nI guess whatever made the music play got lost after a few months. \nI wouldn't blame anyone if they took it for themselves.\n It's more fun than a TV that only plays one thing, anyway.");
+            lines.Push("Gasket: Which one? The C64 styled one with the \nlow droning bass and the 'Dun da-da dun?' melody? \nOr the one with lots of layered pads?");
+            lines.Push("Percival: C64? Layered pads? What does that even mean?");
+            lines.Push("Gasket: Ah, sorry. Those are common in synth music. (Sorta.) \nPoint is, the was one song when the event started. \nThen a different song when everything opened to the public.");
             break;
 
         case BM_TOPIC_INTENT:
@@ -4135,9 +4388,10 @@ class BMConv : Thinker
         int ticks = 70 + lines[0].Length() * 5;
 
         // Time's up for me to work on this. AS a hack, we'll set all texts to be 5 seconds.
-        ticks = 35 * 5;
+        // okay i lied slightly, doubling that to 10 because there's not enough time to actually search the map.
+        ticks = 35 * 10;
 
-        console.PrintF("Ticks For Talk: %i", ticks);
+        //console.PrintF("Ticks For Talk: %i", ticks);
         return ticks;
     }
 
@@ -4200,7 +4454,7 @@ enum BMDialogueTopics
     	Default
     	{
     		DropItem "BMBSting";
-    		Health 50;
+    		Health 20;
     		PainChance 200;
     		Radius 16;
     		Height 56;
@@ -4472,7 +4726,7 @@ class BMFakeTextureGlitch : Actor
     void ResetSecondsTimer()
     {
         timerSec30 = 35 * 30;
-        quakeIntensity += 1; // Scale is 1 to 9. 
+        quakeIntensity += 0.5; // Scale is 1 to 9. 
     }
     
     override void Tick()
@@ -4502,10 +4756,12 @@ class BMFakeTextureGlitch : Actor
             // Reset
             ResetSecondsTimer();
         }
-
-        if (totalTicks == 35 * (150))
+        
+        let ticksRemaining = 35 * (150) * 2;
+        ticksRemaining -= totalTicks;
+        if (ticksRemaining == 0) // 0 time remaining.
         {
-            Console.PrintF("Time's up! Time to move on to the next RAMP.");
+            //Console.PrintF("Time's up! Time to move on to the next RAMP.");
             let eventHandler = BMEventsPlayAsALLCOMERS(EventHandler.Find("BMEventsPlayAsALLCOMERS"));
             if (!eventHandler) 
             {
@@ -4516,6 +4772,14 @@ class BMFakeTextureGlitch : Actor
                 Console.PrintF("Got the event handler. Fade things out.");
                 eventHandler.StartFadeToPink();
             }
+        }
+        else if (ticksRemaining == 35 * 60 * 2) //1 min base, 2 min extended.  
+        {
+            
+        }
+        else if (ticksRemaining == 35 * 30 * 2)  //30 sec base, 1 min extended.
+        {
+
         }
         DarkenSector(GetRandomWorldSector(), 5);
     }
@@ -4618,7 +4882,7 @@ class BMFakeTextureGlitch : Actor
         {
             //skies.Push("OWARPB01");
             skies.Push("SKY1");
-            skies.Push("SKY2");
+            //skies.Push("SKY2");
             skies.Push("SKY3");            
             skies.Push("BMHVRED2");
             skies.Push("SBNEWSI");
@@ -4643,7 +4907,7 @@ class BMFakeTextureGlitch : Actor
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SLIME01")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("LAVA1")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("NUKAGE1")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OWARPB01")));
+        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OWARPA01")));
         validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OLAVAE01")));
 
 
@@ -4671,8 +4935,8 @@ class BMFakeTextureGlitch : Actor
     void ResetFlipTimer()
     {
         timerFlipFlat = Random(20, 45);
-        if (quakeIntensity > 2) {timerFlipFlat = 2;}
-        if (quakeIntensity > 3) {timerFlipFlat = 1;}
+        if (quakeIntensity > 2) {timerFlipFlat = 4;}
+        if (quakeIntensity > 3) {timerFlipFlat = 2;}
     }
 }
 
