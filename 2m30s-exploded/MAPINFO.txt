@@ -1,7 +1,7 @@
 Map MAP01 "2m30sDebug"
 {
     //music = "BMHALFIR"
-    music = ""
+    music = "RTRBTN1K"
 	intermusic = "SSYNACK"
     par = 60
     sky1 = "BMSKY2", 0.1
@@ -103,9 +103,9 @@ DoomEdNums
 Map MAPAFTER "2m 30s x2: Out of Time"
 {
     //music = "BMHALFIR"
-    music = ""
+    music = "ESCBUNNY"
     intermusic = "SSYNACK"
-    par = 60
+    par = 270
     sky1 = "BMSKY2", 0.1
     ExitPic = "SBMENACE"
     LevelNum = 01
