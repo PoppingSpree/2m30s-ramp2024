@@ -3114,7 +3114,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     {
         // Console.PrintF("That's all, folks. On to the next!");
 
-        playerToShake = players[net_arbitrator].mo;
+        let playerToShake = players[net_arbitrator].mo;
 
         bmg.convoDirector.currentConvo.InterruptLine("");
         bmg.convoDirector.show = false;
@@ -3234,7 +3234,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
         if (bmg.followerPercivalUnlocked && optionEnableFollowerPercival)
         {
             
-                        let newThing = Actor(e.thing.Spawn("BMPercivalFollower"));
+                        let newThing = Actor(allcomers.Spawn("BMPercivalFollower"));
                         let adjustedPos =  (allcomers.Pos.X - 64, allcomers.Pos.Y - 64, allcomers.Pos.Z + 64);
                         newThing.SetOrigin(adjustedPos, false);
         } 
@@ -3498,7 +3498,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 
         }
 
-        if (bmg.currentConvo.currentTopic == BM_TOPIC_FOLLOWER_BONUS) {bmg.followerPercivalUnlocked = true;}
+        if (bmg.convoDirector.currentConvo.currentTopic == BM_TOPIC_FOLLOWER_BONUS) {bmg.followerPercivalUnlocked = true;}
 
 /*
 Why is the ZScript version of CheckItem not covered on any of the wikis?
