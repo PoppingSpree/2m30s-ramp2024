@@ -1,4 +1,4 @@
- version "4.5.0"
+ //version "4.12.0"
  
 // To whoever is curious enough to look through this script,
 // Possibly with intent to improve or use it:
@@ -3150,6 +3150,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	{
 	    //console.printf("World Unloaded. Reset all player values to what they were at map start.");
 	    ResetPlayerToPriorState();
+        // Might be possible to hijack the end-screen music via Level.SetInterMusic(wbs.next);, but I don't want to risk it right now.
 	}
 
     override void PlayerEntered(PlayerEvent e)
@@ -3498,8 +3499,15 @@ class BMEventsPlayAsALLCOMERS : EventHandler
         {
 
         }
-
-        if (bmg && bmg.convoDirector && bmg.convoDirector.currentConvo && bmg.convoDirector.currentConvo.currentTopic == BM_TOPIC_FOLLOWER_BONUS) {bmg.followerPercivalUnlocked = true;}
+        BMDialogueTopics curTop = BM_TOPIC_DEBUG;
+        if (bmg && bmg.convoDirector && bmg.convoDirector.currentConvo) {curTop = bmg.convoDirector.currentConvo.currentTopic;} 
+if (curTop == BM_TOPIC_FOLLOWER_BONUS // Adding some more lenient conditions to unlock this.
+    || curTop == BM_TOPIC_ENDINGS_ARE_BEGINNINGS
+    || curTop == BM_TOPIC_30S_CONVINCE_PERCI_GASKET
+    || curTop == BM_TOPIC_30S_CONVINCE_PERCI)
+{
+    bmg.followerPercivalUnlocked = true;
+}
 
 /*
 Why is the ZScript version of CheckItem not covered on any of the wikis?
@@ -3653,6 +3661,12 @@ class KissPanicMeleeEnemy : Demon
         glitter = BMPinkGlitter(Spawn("BMPinkGlitter", Pos));
         glitter.CountGenerations = 3;
         glitter.Vel = (0, 0, 2.0);
+    }
+
+    override void Tick()
+    {
+        Super.Tick();
+        if (!target && players[net_arbitrator].mo) {target = players[net_arbitrator].mo;}
     }
 }
 
@@ -4792,7 +4806,8 @@ class BMFakeTextureGlitch : Actor
 
             int fiveSeconds = 35 * 5 * 2;
             playerToShake.A_QuakeEx(quakeIntensity, quakeIntensity, quakeIntensity / 1.3, fiveSeconds + (quakeIntensity*35*2), 0, 10, "", QF_SHAKEONLY | QF_SCALEUP); // 
-
+            Level.ForceLightning();
+            
             // Reset
             ResetSecondsTimer();
         }
@@ -4939,27 +4954,29 @@ class BMFakeTextureGlitch : Actor
     
     void InitValidTextures()
     {
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSKY2")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVBARS")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMHVGRN")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMSTATIC")));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("BMSKY2"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("BMHVBARS"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("BMHVGRN"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("BMSTATIC"));
         // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK01"))); Not in random pool.
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SBCNCEPT")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("SLIME01")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("LAVA1")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("NUKAGE1")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OWARPA01")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("OLAVAE01")));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("BMPINK02"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("SBCNCEPT"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("SLIME01"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("LAVA1"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("NUKAGE1"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("OWARPA01"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("OWARPA01"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("OWARPA01"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("OLAVAE01"));
 
 
         // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
         // validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("BMPINK02")));
 
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1"))); //This was TNT1A0, but I don't think that works here.
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1")));
-        validTextureIDsForGlitch.Push(int(TexMan.CheckForTexture("F_SKY1")));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("F_SKY1")); //This was TNT1A0, but I don't think that works here.
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("F_SKY1"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("F_SKY1"));
+        validTextureIDsForGlitch.Push(TexMan.CheckForTexture("F_SKY1"));
     }
     
     sector GetRandomWorldSector()
