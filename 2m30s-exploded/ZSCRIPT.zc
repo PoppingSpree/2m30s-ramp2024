@@ -217,6 +217,7 @@ class BMDisc : Inventory
         inventory.respawntics 2010;
         Radius 64;
 		Height 64;
+        Scale 4.0;
         +COUNTITEM;
     }
     states
@@ -3046,7 +3047,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             let tTid = e.thing.TID;
             if (tTid >= 34100)
             {
-                Console.PrintF("A WorldThing died that seems important. Spawning a reward.");
+                //Console.PrintF("A WorldThing died that seems important. Spawning a reward.");
                 Actor newThing;
                 switch(tTid)
                 {
@@ -3073,7 +3074,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
                 }
             }
 
-            if (e.thing is "BMNPCGasket2m30s") 
+            if (e.thing is "BMNPCGasket2m30s" && !(e.thing is "BMNPCPercival2m30s")) 
             {
                 gasketDown = true;
                 let sparkles = BMPinkGlitter(e.thing.Spawn("BMPinkGlitter"));
@@ -3133,7 +3134,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     {
         if (e.ActivatedLine.Index() == 1222) 
         {
-            Console.PrintF("End the level: Train.");
+            Console.PrintF("End Level Cutscene Goes Here: Train.");
             StartFadeToBlack();
         }
     }
@@ -3141,34 +3142,34 @@ class BMEventsPlayAsALLCOMERS : EventHandler
     // This works when leaving the world, not when loading a save.
 	override void WorldLoaded(WorldEvent e)
 	{
-	    console.printf("World Loaded.");
+	    //console.printf("World Loaded.");
 	}
 
     // This works when leaving the world, not when loading a save.
 	override void WorldUnloaded(WorldEvent e)
 	{
-	    console.printf("World Unloaded. Reset all player values to what they were at map start.");
+	    //console.printf("World Unloaded. Reset all player values to what they were at map start.");
 	    ResetPlayerToPriorState();
 	}
 
     override void PlayerEntered(PlayerEvent e)
 	{
-        Console.PrintF("Player Entered.");
+        //Console.PrintF("Player Entered.");
 	}
 
     override void PlayerRespawned(PlayerEvent e)
 	{
-        Console.PrintF("Player Respawned.");
+        //Console.PrintF("Player Respawned.");
 	}
 
     override void NewGame()
 	{
-        Console.PrintF("New Game");
+        //Console.PrintF("New Game");
 	}
 
 	override void PlayerSpawned(PlayerEvent e)
 	{
-        Console.PrintF("Player Spawned.");
+        //Console.PrintF("Player Spawned.");
 		AttachAllcomersForPlayer(e.PlayerNumber);
 	}
 
@@ -3223,7 +3224,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		allcomers.substitute = originalPlayerPawn;
 		allcomers.strangeCounter += 1;
 		
-		console.PrintF("Allcomers counter: (%i)", allcomers.strangeCounter);
+		//console.PrintF("Allcomers counter: (%i)", allcomers.strangeCounter);
 		
 		// This seems to mostly work. Not sure what to do about player death since this doesn't cause the usual death reaction?
 
@@ -3372,7 +3373,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		}
         else if (e.Name == "BMActFinalGlitterFountain") 
 		{
-			console.Printf("BMActFinalGlitterFountain");
+			//console.Printf("BMActFinalGlitterFountain");
             // Spawn a HUGE glitter fountain
             //    if I had more time and felt clever, I'd loop through every remaining entity and do the fountains but I don't.
             let glitterThisGuy = players[net_arbitrator].mo;
@@ -3481,7 +3482,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
                 else if (!percivalDown && !gasketDown && itemCheck && ammoCheck) 
                 {
                     bmg.convoDirector.currentConvo.PopulateConvoByTopic(BM_TOPIC_1M_CONVINCE_PERCI_GASKET);
-                    if (bmftg) {bmftg.ticksBonusReveal = (35 * 13);}
+                    if (bmftg) {bmftg.ticksBonusReveal = (35 * 2);}
                 }
                 else if (!percivalDown && !gasketDown && itemCheck) 
                 {
@@ -3498,7 +3499,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 
         }
 
-        if (bmg.convoDirector.currentConvo.currentTopic == BM_TOPIC_FOLLOWER_BONUS) {bmg.followerPercivalUnlocked = true;}
+        if (bmg && bmg.convoDirector && bmg.convoDirector.currentConvo && bmg.convoDirector.currentConvo.currentTopic == BM_TOPIC_FOLLOWER_BONUS) {bmg.followerPercivalUnlocked = true;}
 
 /*
 Why is the ZScript version of CheckItem not covered on any of the wikis?
@@ -4125,8 +4126,8 @@ class BMConv : Thinker
             else if (currentTopic == BM_TOPIC_0S_CONVINCE_PERCI) {PopulateConvoByTopic(BM_TOPIC_FOLLOWER_BONUS); }
 
             else if (currentTopic == BM_TOPIC_1M_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_30S_CONVINCE_PERCI_GASKET);}
-            else if (currentTopic == BM_TOPIC_30S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_0S_CONVINCE_PERCI_GASKET);}
-            else if (currentTopic == BM_TOPIC_0S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_ENDINGS_ARE_BEGINNINGS);}
+            else if (currentTopic == BM_TOPIC_30S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_ENDINGS_ARE_BEGINNINGS);}
+            //else if (currentTopic == BM_TOPIC_0S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_ENDINGS_ARE_BEGINNINGS);}
             else if (currentTopic == BM_TOPIC_ENDINGS_ARE_BEGINNINGS) {PopulateConvoByTopic(BM_TOPIC_FOLLOWER_BONUS);}
 
             else if (currentTopic == BM_TOPIC_FOLLOWER_BONUS) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
@@ -4281,7 +4282,7 @@ class BMConv : Thinker
                 lines.Push("Gasket: I like a good thrill, but sometimes just \nkicking back and watching how things play out feels better.");
                 lines.Push("Percival: I like being able to talk with all kinds of people. \nWhere I came from, there weren't many people \mand they all kept secrets.");
                 lines.Push("Gasket: Do-ers, watchers, teachers, talkers. \nA strong community takes all sorts.");
-                lines.Push("Percival: ");
+                lines.Push("Percival: I've... only really ever met two of those sorts.");
             break;
         case BM_TOPIC_1M_PERCI_GASKET:
                 lines.Clear();
@@ -4378,8 +4379,8 @@ class BMConv : Thinker
         case BM_TOPIC_30S_CONVINCE_PERCI_GASKET:
                 lines.Clear();
                 lines.Push("Percival: Get to the train! We're coming! We're coming!");
-                lines.Push("Percival: Get to the train! We're coming! We're coming!");
-                lines.Push("Gasket: Hold on tight, Percy. This is gonna be a hell of a ride!");
+                //lines.Push("Percival: Get to the train! We're coming! We're coming!");
+                //lines.Push("Gasket: Hold on tight, Percy. This is gonna be a hell of a ride!");
                 lines.Push("Gasket: Hold on tight, Percy. This is gonna be a hell of a ride!");
             break;
         case BM_TOPIC_0S_CONVINCE_PERCI_GASKET:
@@ -4810,7 +4811,7 @@ class BMFakeTextureGlitch : Actor
             }
             else 
             {
-                Console.PrintF("Got the event handler. Fade things out.");
+                // Console.PrintF("Got the event handler. Fade things out.");
                 eventHandler.StartFadeToPink();
             }
         }
