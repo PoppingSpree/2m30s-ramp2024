@@ -3023,28 +3023,29 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 	{
 		if (e.thing) // Check that the Actor is valid
 		{
-            let tTid = e.thing.GetThingID();
+            let tTid = e.thing.TID;
             if (tTid >= 34100)
             {
                 Console.PrintF("A WorldThing died that seems important. Spawning a reward.");
+                Actor newThing;
                 switch(tTid)
                 {
                     case 34100:
                     case 34101:
-                        let newThing = BMTicket2024(e.thing.Spawn("BMTicket2024"));
-                        newThing.SetOrigin(e.thing.Pos);
+                        newThing = Actor(e.thing.Spawn("BMTicket2024"));
+                        newThing.SetOrigin(e.thing.Pos, false);
                         break;
                     case 34102:
-                        let newThing = BMDisc(e.thing.Spawn("BMDisc"));
-                        newThing.SetOrigin(e.thing.Pos);
+                        newThing = Actor(e.thing.Spawn("BMDisc"));
+                        newThing.SetOrigin(e.thing.Pos, false);
                         break;
                     case 34103:
-                        let newThing = BMDangerNoodle(e.thing.Spawn("BMDangerNoodle"));
-                        newThing.SetOrigin(e.thing.Pos);
+                        newThing = Actor(e.thing.Spawn("BMDangerNoodle"));
+                        newThing.SetOrigin(e.thing.Pos, false);
                         break;
                     case 34104:
-                        let newThing = BMDoomressNoArmor(e.thing.Spawn("BMDoomressNoArmor"));
-                        newThing.SetOrigin(e.thing.Pos);
+                        newThing = Actor(e.thing.Spawn("BMDoomressNoArmor"));
+                        newThing.SetOrigin(e.thing.Pos, false);
                         break;
                     default:
                         break;
@@ -3054,8 +3055,8 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             if (e.thing is "BMNPCGasket2m30s") 
             {
                 let sparkles = BMPinkGlitter(e.thing.Spawn("BMPinkGlitter"));
-                sparkles.generations = 4;
-                sparkles.SetOrigin(e.thing.Pos);
+                sparkles.CountGenerations = 4;
+                sparkles.SetOrigin(e.thing.Pos, false);
                 
             }
 
@@ -3083,6 +3084,10 @@ class BMEventsPlayAsALLCOMERS : EventHandler
 		vector3 Prev
 		The previous position of the actor.
 		*/
+
+        /*
+        This whole system seems brittle and prone to breakage when reloading save files. Maybe I need to move from PlayerSpawned to WorldLoaded?
+        */
 		
 		// Bug that will hopefully just not happen often:
 		// If the player change-maps across maps wwhere this code is used,
@@ -3302,7 +3307,7 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             // Draw the backing texture.
             //dialogueBG = 
             TextureID test = TexMan.CheckForTexture("SBNEWSI");
-            Screen.DrawTexture(test, true, 0, 32, DTA_Alpha, 0.666, DTA_ScaleX, 20, DTA_FullScreenScale, FSMode_ScaleToFit);
+            Screen.DrawTexture(test, true, 0, 64, DTA_Alpha, 0.666, DTA_ScaleX, 20, DTA_FullScreenScale, FSMode_ScaleToFit);
 
             // Draw the text.
             //HUDfont bmDoomFont = HUDFont.Create(smallfont); // I don't want to create this every frame...
@@ -3311,13 +3316,14 @@ class BMEventsPlayAsALLCOMERS : EventHandler
             fontLineOffset += fontHeight + 2;
 
             //This draws where I want, but no built in wordwrap...
-            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "Debug WOW THIS IS SOME TEXT\ntest/ntest\ntest/ntest\ntest/ntest\ntest/ntest", DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
+            
+            //Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "Debug WOW THIS IS SOME TEXT\ntest/ntest\ntest/ntest\ntest/ntest\ntest/ntest", DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
 
 
             //statusbar.DrawString(bmDoomFont, "Debug WOW THIS IS SOME TEXT", (32,32 + fontLineOffset),
             //statusbar.DI_SCREEN_LEFT_TOP, Font.CR_UNTRANSLATED, 1.0, 128);
             fontLineOffset += fontHeight + 2;
-            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 32 + fontLineOffset, "bmg.convoDirector.currentConvo.GetCurrentLine()", DTA_ScaleX, 4.0, DTA_ScaleY, 4.0);
+            Screen.DrawText(smallfont, Font.CR_WHITE, 32, 64 + fontLineOffset, bmg.convoDirector.currentConvo.currentLine, DTA_ScaleX, 2.0, DTA_ScaleY, 2.0);
             //statusbar.DrawString(bmDoomFont, bmg.convoDirector.currentConvo.GetCurrentLine(), (0,fontLineOffset)); // oh boy i didn't plan for wordwrap. oop.
             // bmg.convoDirector.currentConvo.AdvanceLineCountdown(); DON'T DO THIS HERE, this runs on DRAW SPEED, which is much more variable than GameTicks.
 
@@ -3782,7 +3788,7 @@ class BMGlobalVariables : Thinker
 
 }
 
-class BMConv
+class BMConv : Thinker
 {
     int lineIndex;
     int countdownLineDisplay;
@@ -3790,6 +3796,7 @@ class BMConv
     int oneSec;
     bool currentConvoDone;
     BMDialogueTopics currentTopic;
+    string currentLine;
 
     string GetCurrentLine()
     {
@@ -3807,6 +3814,7 @@ class BMConv
     {
         countdownLineDisplay--;
         if (countdownLineDisplay < 1){AdvanceLine();}
+        currentLine = GetCurrentLine();
     }
     void AdvanceLine()
     {
@@ -3821,6 +3829,26 @@ class BMConv
             countdownLineDisplay = 9999*9999;
             lineIndex = 0;
             currentConvoDone = true;
+
+            if (currentTopic == BM_TOPIC_POST_END_EMPTY_FILLER) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else if (currentTopic == BM_TOPIC_1M_SOLO_PERCI) {PopulateConvoByTopic(BM_TOPIC_30S_SOLO_PERCI);}
+            else if (currentTopic == BM_TOPIC_30S_SOLO_PERCI) {PopulateConvoByTopic(BM_TOPIC_0S_SOLO_PERCI);}
+            else if (currentTopic == BM_TOPIC_0S_SOLO_PERCI) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else if (currentTopic == BM_TOPIC_1M_SOLO_GASKET) {PopulateConvoByTopic(BM_TOPIC_30S_SOLO_GASKET);}
+            else if (currentTopic == BM_TOPIC_30S_SOLO_GASKET) {PopulateConvoByTopic(BM_TOPIC_0S_SOLO_GASKET);}
+            else if (currentTopic == BM_TOPIC_0S_SOLO_GASKET) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else if (currentTopic == BM_TOPIC_1M_CONVINCE_PERCI) {PopulateConvoByTopic(BM_TOPIC_30S_CONVINCE_PERCI);}
+            else if (currentTopic == BM_TOPIC_30S_CONVINCE_PERCI) {PopulateConvoByTopic(BM_TOPIC_0S_CONVINCE_PERCI);}
+            else if (currentTopic == BM_TOPIC_0S_CONVINCE_PERCI) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else if (currentTopic == BM_TOPIC_1M_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_30S_CONVINCE_PERCI_GASKET);}
+            else if (currentTopic == BM_TOPIC_30S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_0S_CONVINCE_PERCI_GASKET);}
+            else if (currentTopic == BM_TOPIC_0S_CONVINCE_PERCI_GASKET) {PopulateConvoByTopic(BM_TOPIC_POST_END_EMPTY_FILLER);}
+
+            else {PopulateConvoByRandom();}
         }
     }
 
@@ -3841,7 +3869,7 @@ class BMConv
     void PopulateConvoByRandom()
     {
         currentTopic = PickRandomTopic();
-        PopulateConvoByTopic(currentTopic)
+        PopulateConvoByTopic(currentTopic);
     }
     
     void PopulateConvoByTopic(BMDialogueTopics topic)
@@ -3863,7 +3891,7 @@ class BMConv
                 lines.Clear();
                 lines.Push("Gasket: I'm getting the strangestest feeling that we've done this before.");
                 lines.Push("Percival: We've been here for a while. Of course we mention the same topics sometimes.");
-                lines.Push("Gasket: Not like that, hun. \nIt's as if timelines are jumping left and right, starting and stopping... );
+                lines.Push("Gasket: Not like that, hun. \nIt's as if timelines are jumping left and right, starting and stopping... ");
                 lines.Push("Percival: Like it's all been reset?");
             break;
 
@@ -3908,23 +3936,23 @@ class BMConv
                 lines.Clear();
                 lines.Push("Percival: There was this one time where I was visiting the neighbors. And they had this huge, uh, decoration near the front door. \nI wasn't sure what it was, so I asked why they had such a massive thingy on display... and I tripped and fell on top of it.");
                 lines.Push("Gasket: Let me guess... \nit was a carrot sculpture?");
-                lines.Push("Percival: it was so embarrassing! But later that week, everyone started making... tributes? \nIt was so embarassing, but people found it endearing. They even made drawings of me! I swear \nI saved them on a disc somewhere, but I can't remember...");
+                lines.Push("Percival: !!! It was so embarrassing! But later that week, everyone started making... tributes? \nIt was so embarassing, but people found it endearing. They even made drawings of me! I swear \nI saved them on a disc somewhere, but I can't remember...");
                 lines.Push("Gasket: Sounds like you were quite the muse, Percy.");
             break;
         case BM_TOPIC_FRIENDSHIP:
             lines.Clear();
             lines.Push("Percival: I'm glad we stuck together through all this, Gasket. I was cared when I first got here. \nAnd truthfully, I'm still scared. But having familiar faces to talk with helps a lot.");
-            lines.Push("Gasket: Yeah, dunno where I'd be now if I hadn't met you, Percy. You're not so bad for a fluffy bunny.");
+            lines.Push("Gasket: Yeah, dunno where I'd be now if I hadn't met you, Percy. \nYou're not so bad for a fluffy bouncy bunny.");
             lines.Push("Percival: And you're not so bad for a motorhead.");
             lines.Push("Gasket: I'm as highly skilled a mercenary as I am a mechanic!"); 
             break;
 
         case BM_TOPIC_ART_BLOCK:
             lines.Clear();
-            lines.Push("Percival: I'm feeling a bit stuck lately. Like my ideas have dried up.");
-            lines.Push("Gasket: Creator's block, huh? Happens to the best of us. Try taking a break, doing something different for a while.");
-            lines.Push("Percival: Maybe I should just give up. I'm not sure I'm cut out for whatever this is we're doing here.");
-            lines.Push("Gasket: Don't say that, Percy. You've got talent. Just need to find that spark again.\nTake your time. Rest if you need to. And we'll figure out what next when we get there.");
+            lines.Push("Percival: I'm feeling a bit stuck lately. \nLike my ideas have dried up.");
+            lines.Push("Gasket: Creator's block, huh? Happens to the best of us. \nTry taking a break, doing something different for a while.");
+            lines.Push("Percival: Maybe I should just give up. \nI'm not sure I'm cut out for whatever this is we're doing here.");
+            lines.Push("Gasket: Don't say that, Percy. You've got talent. \nJust need to find that spark again. Take your time. \nRest if you need to. And we'll figure out what next when we get there.");
             break;
 
         case BM_TOPIC_FEEDBACK:
@@ -3932,44 +3960,44 @@ class BMConv
             lines.Push("Percival: I like to hug everyone I meet. It's just so warm and pleasant. But sometimes people don't like that and I feel bad.");
             lines.Push("Gasket: Look, you can't please everyone. It's good to focus on making yourself happy... \nBut maybe ask first when touching other people or their belongs.");
             lines.Push("Percival: I don't want to make anyone uncomfortable. \nBut didn't you tell me to be myself and do things my way? To find my own style?");
-            lines.Push("Gasket: You can bake your cakes however you like, but when you cook for others, you ask their allergies before you give them a nasty surprise. \nYou might not get the chance to make ammends if you don't. \nWhen people ask for changes, don't let it get you down. Use it to learn and grow.");
+            lines.Push("Gasket: You can bake your cakes however you like, \nbut when you cook for others, you ask their allergies before you give them a nasty surprise. \nYou might not get the chance to make ammends if you don't. \nWhen people ask for changes, don't let it get you down. Use it to learn and grow.");
             break;
 
         case BM_TOPIC_CELEBRATION:
             lines.Clear();
-            lines.Push("Percival: Whatever happened to all the music? It was all festive and trancy to celebrate all the new portals and visitors!");
-            lines.Push("Gasket: Which one? The C64 styled one with the low droning bass and the 'Dun da-da dun?' melody? Or the one with lots of layed pads?");
+            lines.Push("Percival: Whatever happened to all the music? \nIt was all festive and trancy to celebrate all the new portals and visitors!");
+            lines.Push("Gasket: Which one? The C64 styled one with the \nlow droning bass and the 'Dun da-da dun?' melody? \nOr the one with lots of layed pads?");
             lines.Push("Percival: C64? Pads? What does that even mean?");
-            lines.Push("Gasket: Ah, sorry. Different ways of making music. (Sorta.) When the event was getting setup, the music was different.\nThen it got changed when they opened the gates for everyone to flood in. \nI guess whatever made the music play got lost after a few months. I wouldn't blame anyone if they took it for themselves.\n It's more fun than a TV that only plays one thing, anyway.");
+            lines.Push("Gasket: Ah, sorry. Different ways of making music. (Sorta.) \nWhen the event was getting setup, the music was different.\nThen it got changed when they opened the gates for everyone to flood in. \nI guess whatever made the music play got lost after a few months. \nI wouldn't blame anyone if they took it for themselves.\n It's more fun than a TV that only plays one thing, anyway.");
             break;
 
         case BM_TOPIC_INTENT:
             lines.Clear();
             lines.Push("Percival: Sometimes I think I have a great idea, but when I try to share it it doesn't go according to plan.");
-            lines.Push("Gasket: Yeah. Trying to estimate the meeting point of intent and execution is a skill on its own. \nAnd not a one-sided one. Even if you say what you intended, others might interpret it differently.");
-            lines.Push("Percival: That's so annoying! It'd be much better if we could just have it exactly how we want it.");
-            lines.Push("Gasket: Maybe. But sometimes the bumps on the ride are what make it memorable.");
+            lines.Push("Gasket: Yeah. Trying to estimate the meeting point of \nintent and execution is a skill on its own. \nAnd not a one-sided one. Even if you say what you intended, others might interpret it differently.");
+            lines.Push("Percival: That's so annoying! It'd be much better \nif we could just have it exactly how we want it.");
+            lines.Push("Gasket: Maybe. But sometimes the bumps \non the ride are what make it memorable.");
             break;
 
         case BM_TOPIC_DOODLING:
             lines.Clear();
-            lines.Push("Percival: Sometimes I just do things without thinking. It's like my body takes over.");
-            lines.Push("Gasket: That can be good for the soul, Percy. It's a way to let your mind wander and see what comes out.");
-            lines.Push("Percival: Maybe I should try that more often. It might help me get out of this creative funk.");
-            lines.Push("Gasket: Give it a shot. You might surprise yourself. And if you don't like what you get, you don't have to share it.\nI guess, unless you do it in public while peopl watch.");
+            lines.Push("Percival: Sometimes I just do things without thinking. \nIt's like my body takes over.");
+            lines.Push("Gasket: That can be good for the soul, Percy. \nIt's a way to let your mind wander and see what comes out.");
+            lines.Push("Percival: Maybe I should try that more often. \nIt might help me get out of this creative funk.");
+            lines.Push("Gasket: Give it a shot. You might surprise yourself.\n And if you don't like what you get, you don't have to share it.\nI guess, unless you do it in public while peopl watch.");
             break;
         case BM_TOPIC_CONVERSATION:
                 lines.Clear();
                 lines.Push("Gasket: People are really big into bats lately. I don't think I'd fancy being a bat. \nWings are gross and I can't imagine using a wrench with 'em.");
                 lines.Push("Percival: I think you're make a beautiful bat if you wanted to be a bat!");
-                lines.Push("Gasket: Aw, that's sweet of you. Come to think, I'm reminded of really bouncy portal I wandered into once. Reminds me of you.");
-                lines.Push("Percival: You think I'm bouncy? Wait, how can a portal be bouncy?");
+                lines.Push("Gasket: Aw, that's sweet of you. Come to think, \nI'm reminded of really bouncy portal I wandered into once. Reminds me of you.");
+                lines.Push("Percival: You think I'm bouncy? \nWait, how can a portal be bouncy?");
             break;
         case BM_TOPIC_SOCIAL:
                 lines.Clear();
-                lines.Push("Gasket: I like a good thrill, but sometimes just kicking back and watching how things play out feels better.");
-                lines.Push("Percival: I like being able to talk with all kinds of people. \nWhere I came from, there weren't many people and they all kept secrets.");
-                lines.Push("Gasket: Do-ers, watchers, teachers, talkers. A strong community takes all sorts.");
+                lines.Push("Gasket: I like a good thrill, but sometimes just \nkicking back and watching how things play out feels better.");
+                lines.Push("Percival: I like being able to talk with all kinds of people. \nWhere I came from, there weren't many people \mand they all kept secrets.");
+                lines.Push("Gasket: Do-ers, watchers, teachers, talkers. \nA strong community takes all sorts.");
                 lines.Push("Percival: ");
             break;
         case BM_TOPIC_1M_PERCI_GASKET:
@@ -4086,6 +4114,12 @@ class BMConv
                 lines.Push("Goodbye RAMP!\nAnd...\nHello RAMP!");
                 lines.Push("You may now summon Percival at any time via console with:\nsummon BMPercivalFollower\n(You always could. This was supposed to be an unlockable but I ran out of time lol.)");
                 lines.Push("Wishing you all the best and hope you're having a good time!\nStay strong, explore, experiment, create, and get messy! It's more fun that way (usually)!");
+        case BM_TOPIC_POST_END_EMPTY_FILLER:
+                lines.Clear();
+                lines.Push("");
+                lines.Push("");
+                lines.Push("");
+                lines.Push("");
             break;
             default:
                 lines.Clear();
@@ -4158,6 +4192,7 @@ enum BMDialogueTopics
 
 		BM_TOPIC_ENDINGS_ARE_BEGINNINGS,
 		BM_TOPIC_FOLLOWER_BONUS,
+        BM_TOPIC_POST_END_EMPTY_FILLER,
 	};
 
 	class BMNPCGasket2m30s : Actor
